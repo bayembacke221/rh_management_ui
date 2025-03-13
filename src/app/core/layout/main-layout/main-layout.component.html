@@ -1,0 +1,19 @@
+<div class="flex h-screen overflow-hidden bg-gray-100">
+  <!-- Sidebar Component -->
+  <app-sidebar [isOpen]="isSidebarOpen"></app-sidebar>
+
+  <!-- Main content wrapper  -->
+  <div class="flex flex-col flex-1 w-full"
+       [ngClass]="isSidebarOpen ? 'ml-64' : 'ml-16'">
+
+    <!-- Top navigation -->
+    <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
+
+    <!-- Page content with scrolling -->
+    <main class="flex-1 overflow-y-auto p-6 bg-gray-100">
+      <div class="container mx-auto">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
