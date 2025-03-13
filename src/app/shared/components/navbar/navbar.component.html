@@ -1,0 +1,134 @@
+<nav class="bg-white shadow">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex">
+        <!-- Sidebar toggle -->
+        <div class="-ml-2 mr-2 flex items-center">
+          <button (click)="toggleSidebar.emit()" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+            <span class="sr-only">Ouvrir le menu</span>
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Search bar -->
+        <div class="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:justify-start">
+          <div class="max-w-lg w-full lg:max-w-xs">
+            <label for="search" class="sr-only">Rechercher</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input id="search" name="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Rechercher" type="search">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right section -->
+      <div class="flex items-center">
+        <!-- Notification bell -->
+        <button (click)="toggleNotifications()" type="button" class="relative p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <span class="sr-only">Voir les notifications</span>
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+        </button>
+
+        <!-- Profile dropdown -->
+        <div class="ml-4 relative flex-shrink-0">
+          <div>
+            <button (click)="toggleUserDropdown()" type="button" class="bg-white rounded-full flex focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu" aria-expanded="false" aria-haspopup="true">
+              <span class="sr-only">Ouvrir le menu utilisateur</span>
+              <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name={{currentUser?.fullName}}&background=0D8ABC&color=fff" alt="">
+            </button>
+          </div>
+
+          <!-- User dropdown menu -->
+          <div *ngIf="userDropdownOpen" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
+            <div class="block px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+              <p class="font-medium">{{ currentUser?.fullName }}</p>
+              <p class="text-gray-500">{{ currentUser?.email }}</p>
+            </div>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Votre Profil</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Paramètres</a>
+            <button (click)="logout()" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Se déconnecter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications dropdown -->
+  <div *ngIf="notificationsOpen" class="absolute right-12 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" role="menu">
+    <div class="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <p class="font-medium">Notifications</p>
+        <a href="#" class="text-blue-600 text-xs">Marquer toutes comme lues</a>
+      </div>
+    </div>
+
+    <!-- Notification items -->
+    <div class="max-h-72 overflow-y-auto">
+      <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition duration-150 ease-in-out border-b border-gray-100">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe&background=0D8ABC&color=fff" alt="">
+          </div>
+          <div class="ml-3 w-0 flex-1">
+            <p class="text-sm font-medium text-gray-900">Nouveau contrat pour Jean Dupont</p>
+            <p class="text-sm text-gray-500">Le contrat CDI est prêt à être signé</p>
+            <p class="mt-1 text-xs text-gray-500">Il y a 2 heures</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition duration-150 ease-in-out border-b border-gray-100">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+              <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3 w-0 flex-1">
+            <p class="text-sm font-medium text-gray-900">Demande de congés approuvée</p>
+            <p class="text-sm text-gray-500">Votre demande du 15/07 au 30/07 a été acceptée</p>
+            <p class="mt-1 text-xs text-gray-500">Hier</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition duration-150 ease-in-out">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+              <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3 w-0 flex-1">
+            <p class="text-sm font-medium text-gray-900">Alerte fin de période d'essai</p>
+            <p class="text-sm text-gray-500">Marie Martin - Fin de période d'essai dans 7 jours</p>
+            <p class="mt-1 text-xs text-gray-500">Il y a 3 jours</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="px-4 py-2 text-sm border-t border-gray-200">
+      <a href="#" class="text-blue-600 flex justify-center items-center">
+        Voir toutes les notifications
+        <svg class="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</nav>
