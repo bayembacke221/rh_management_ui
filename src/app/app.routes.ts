@@ -3,6 +3,11 @@ import { authGuard, loginGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent),
     canActivate: [loginGuard]
@@ -13,15 +18,21 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      },
-      {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
-
+      // {
+      //   path: 'employees',
+      //   loadChildren: () => import('./features/employees/employees.routes').then(r => r.EMPLOYEE_ROUTES)
+      // },
+      // {
+      //   path: 'departments',
+      //   loadChildren: () => import('./features/departments/departments.routes').then(r => r.DEPARTMENT_ROUTES)
+      // },
+      // {
+      //   path: 'positions',
+      //   loadChildren: () => import('./features/positions/positions.routes').then(r => r.POSITION_ROUTES)
+      // }
     ]
   },
   {
