@@ -5,223 +5,252 @@
   </div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-    <!-- Stats cards -->
-    <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      <div *ngFor="let stat of stats" class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div [class]="stat.bgColor + ' rounded-md p-3'">
-              <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="stat.icon" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
+    <!-- Loading state -->
+    <div *ngIf="loading" class="py-10 text-center">
+      <svg class="animate-spin h-10 w-10 mx-auto text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-3 text-lg text-gray-600">Chargement des données...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="error" class="py-10 text-center">
+      <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+        <svg class="h-12 w-12 mx-auto text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-2 text-lg font-medium text-red-800">Erreur de chargement</h3>
+        <p class="mt-1 text-red-700">Impossible de charger les données du tableau de bord. Veuillez réessayer plus tard.</p>
+        <button (click)="loadDashboardData()" class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          Réessayer
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard content -->
+    <div *ngIf="!loading && !error">
+      <!-- Stats cards -->
+      <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div *ngFor="let stat of stats" class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div [class]="stat.bgColor + ' rounded-md p-3'">
+                <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="stat.icon" />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
                 <dt class="text-sm font-medium text-gray-500 truncate">
                   {{ stat.title }}
                 </dt>
-                <dd>
-                  <div class="text-lg font-medium text-gray-900">
+                <dd class="flex items-baseline">
+                  <div class="text-2xl font-semibold text-gray-900">
                     {{ stat.value }}
                   </div>
+                  <div class="ml-2 flex items-baseline text-sm font-semibold"
+                       [class.text-green-600]="stat.changeType === 'increase'"
+                       [class.text-red-600]="stat.changeType === 'decrease'">
+                    <svg class="self-center flex-shrink-0 h-5 w-5"
+                         [class.text-green-500]="stat.changeType === 'increase'"
+                         [class.text-red-500]="stat.changeType === 'decrease'"
+                         fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fill-rule="evenodd"
+                            [attr.d]="stat.changeType === 'increase' ? 'M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z' : 'M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z'"
+                            clip-rule="evenodd">
+                      </path>
+                    </svg>
+                    <span class="sr-only">{{ stat.changeType === 'increase' ? 'Augmenté' : 'Diminué' }} par</span>
+                    {{ stat.change }}
+                  </div>
                 </dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-50 px-5 py-3">
-          <div class="text-sm">
-            <div class="font-medium flex items-center"
-                 [class.text-green-600]="stat.changeType === 'increase'"
-                 [class.text-red-600]="stat.changeType === 'decrease'">
-              <svg *ngIf="stat.changeType === 'increase'" class="h-5 w-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-              </svg>
-              <svg *ngIf="stat.changeType === 'decrease'" class="h-5 w-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-              {{ stat.change }} depuis le mois dernier
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Content sections -->
-    <div class="grid grid-cols-1 gap-5 mt-6 lg:grid-cols-3">
-      <!-- Recent hires -->
-      <div class="bg-white overflow-hidden shadow rounded-lg lg:col-span-2">
-        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-          <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Derniers recrutements
-          </h3>
-          <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-            Voir tous les employés
-          </a>
+      <!-- Recent hires and expiring contracts -->
+      <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <!-- Recent hires -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <div>
+              <h3 class="text-lg leading-6 font-medium text-gray-900">
+                Employés récemment embauchés
+              </h3>
+              <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Derniers employés ayant rejoint l'entreprise
+              </p>
+            </div>
+            <a routerLink="/employees/list" class="text-sm text-blue-600 hover:text-blue-800">
+              Voir tous les employés
+            </a>
+          </div>
+          <div class="border-t border-gray-200 divide-y divide-gray-200">
+            <div *ngIf="recentEmployees.length === 0" class="px-4 py-8 text-center text-gray-500">
+              Aucun employé récemment embauché
+            </div>
+            <div *ngFor="let employee of recentEmployees" class="px-4 py-3 sm:px-6 hover:bg-gray-50">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <img class="h-10 w-10 rounded-full"
+                       src="https://ui-avatars.com/api/?name={{employee.firstName}}+{{employee.lastName}}&background=0D8ABC&color=fff"
+                       alt="{{employee.firstName}} {{employee.lastName}}">
+                </div>
+                <div class="ml-4 flex-1">
+                  <div class="flex justify-between">
+                    <div>
+                      <div class="text-sm font-medium text-gray-900">
+                        {{employee.firstName}} {{employee.lastName}}
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        {{employee.position?.title}}
+                      </div>
+                    </div>
+                    <div>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                            [ngClass]="getStatusClass(employee.status!)">
+                        {{employee.status}}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mt-1 flex text-xs text-gray-500">
+                    <span class="mr-3 flex items-center">
+                      <svg class="mr-1 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                      </svg>
+                      Embauché le {{formatDate(employee.hireDate)}}
+                    </span>
+                    <span class="flex items-center">
+                      <svg class="mr-1 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                      </svg>
+                      {{employee.departement?.name}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="border-t border-gray-200 divide-y divide-gray-200">
-          <div class="overflow-hidden overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+
+        <!-- Expiring contracts -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <div>
+              <h3 class="text-lg leading-6 font-medium text-gray-900">
+                Contrats expirant prochainement
+              </h3>
+              <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Contrats qui arrivent à échéance dans les 30 prochains jours
+              </p>
+            </div>
+            <a routerLink="/contracts" class="text-sm text-blue-600 hover:text-blue-800">
+              Voir tous les contrats
+            </a>
+          </div>
+          <div class="border-t border-gray-200 divide-y divide-gray-200">
+            <div *ngIf="expiringContracts.length === 0" class="px-4 py-8 text-center text-gray-500">
+              Aucun contrat expirant prochainement
+            </div>
+            <div *ngFor="let contract of expiringContracts" class="px-4 py-3 sm:px-6 hover:bg-gray-50">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4 flex-1">
+                  <div class="flex justify-between">
+                    <div>
+                      <div class="text-sm font-medium text-gray-900">
+                        {{contract.employee?.firstName}} {{contract.employee?.lastName}}
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        {{contract.type}}
+                      </div>
+                    </div>
+                    <div>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                            [ngClass]="getContractStatusClass(contract.status!)">
+                        {{contract.status}}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mt-1 flex text-xs text-gray-500">
+                    <span class="mr-3 flex items-center">
+                      <svg class="mr-1 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                      </svg>
+                      Expire le {{formatDate(contract.endDate)}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Department statistics -->
+      <div class="mt-8">
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              Statistiques par département
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+              Répartition des employés par département
+            </p>
+          </div>
+          <div class="border-t border-gray-200">
+            <div *ngIf="departmentStats.length === 0" class="px-4 py-8 text-center text-gray-500">
+              Aucune statistique par département disponible
+            </div>
+            <table *ngIf="departmentStats.length > 0" class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nom
+                  Département
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Poste
+                  Code
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date d'entrée
+                  Total Employés
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Statut
+                  Actifs
                 </th>
-                <th scope="col" class="relative px-6 py-3">
-                  <span class="sr-only">Actions</span>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  En congé
                 </th>
               </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let employee of recentEmployees">
+              <tr *ngFor="let stat of departmentStats">
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                      <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{employee.name}}&background=6366F1&color=fff" alt="">
-                    </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ employee.name }}
-                      </div>
-                      <div class="text-sm text-gray-500">
-                        {{ employee.department }}
-                      </div>
-                    </div>
-                  </div>
+                  <div class="text-sm font-medium text-gray-900">{{stat.departmentName}}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ employee.position }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ employee.startDate }}
+                  <div class="text-sm text-gray-500">{{stat.departmentCode}}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="getStatusClass(employee.status)">
-                      {{ employee.status === 'active' ? 'Actif' : employee.status === 'pending' ? 'En attente' : 'Terminé' }}
-                    </span>
+                  <div class="text-sm text-gray-900">{{stat.totalEmployees}}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <a routerLink="/employees/{{employee.id}}" class="text-blue-600 hover:text-blue-900">Voir</a>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-green-600">{{stat.activeEmployees}}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-yellow-600">{{stat.onLeaveEmployees}}</div>
                 </td>
               </tr>
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
-
-      <!-- Tasks / Quick actions -->
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-          <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Actions en attente
-          </h3>
-          <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-            Voir tout
-          </a>
-        </div>
-        <div class="border-t border-gray-200 p-4">
-          <ul class="divide-y divide-gray-200">
-            <li class="py-3">
-              <div class="flex items-start">
-                <div class="flex-shrink-0 pt-1">
-                  <svg class="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div class="ml-3 w-0 flex-1">
-                  <p class="text-sm font-medium text-gray-900">5 demandes de congés à valider</p>
-                  <p class="mt-1 text-sm text-gray-500">Dont 2 urgentes (moins de 3 jours)</p>
-                </div>
-              </div>
-            </li>
-            <li class="py-3">
-              <div class="flex items-start">
-                <div class="flex-shrink-0 pt-1">
-                  <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <div class="ml-3 w-0 flex-1">
-                  <p class="text-sm font-medium text-gray-900">3 contrats à renouveler</p>
-                  <p class="mt-1 text-sm text-gray-500">CDD arrivant à échéance ce mois-ci</p>
-                </div>
-              </div>
-            </li>
-            <li class="py-3">
-              <div class="flex items-start">
-                <div class="flex-shrink-0 pt-1">
-                  <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <div class="ml-3 w-0 flex-1">
-                  <p class="text-sm font-medium text-gray-900">2 entretiens d'évaluation en retard</p>
-                  <p class="mt-1 text-sm text-gray-500">Période d'essai à confirmer</p>
-                </div>
-              </div>
-            </li>
-            <li class="py-3">
-              <div class="flex items-start">
-                <div class="flex-shrink-0 pt-1">
-                  <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <div class="ml-3 w-0 flex-1">
-                  <p class="text-sm font-medium text-gray-900">4 nouveaux CV à traiter</p>
-                  <p class="mt-1 text-sm text-gray-500">Pour le poste de Développeur React</p>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="bg-gray-50 px-4 py-4 sm:px-6">
-          <div class="flex justify-center">
-            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              Traiter les actions en attente
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Calendar section -->
-    <div class="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
-      <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Calendrier des événements
-        </h3>
-        <div class="flex space-x-3">
-          <button type="button" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-1 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-            </svg>
-            Précédent
-          </button>
-          <span class="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700">
-            Avril 2023
-          </span>
-          <button type="button" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            Suivant
-            <svg class="ml-1 mr-1 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-        <div class="text-center text-gray-500 pb-4">
-          Calendrier ici
         </div>
       </div>
     </div>
