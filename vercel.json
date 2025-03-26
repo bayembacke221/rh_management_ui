@@ -10,9 +10,11 @@
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    { "src": "^/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "^/(.*\\.js)$", "headers": { "content-type": "application/javascript" }, "dest": "/$1" },
+    { "src": "^/(.*\\.css)$", "headers": { "content-type": "text/css" }, "dest": "/$1" },
+    { "src": "^/(.*\\.html)$", "headers": { "content-type": "text/html" }, "dest": "/$1" },
+    { "src": "^/(.*\\.ico)$", "headers": { "content-type": "image/x-icon" }, "dest": "/$1" },
+    { "src": ".*", "dest": "/index.html" }
   ]
 }
