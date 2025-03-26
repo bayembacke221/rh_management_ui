@@ -15,13 +15,13 @@ export interface GetExpiringContracts$Params {
 /**
  * Nombre de jours avant expiration
  */
-  arg0?: number;
+  days?: number;
 }
 
 export function getExpiringContracts(http: HttpClient, rootUrl: string, params?: GetExpiringContracts$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ContractDto>>> {
   const rb = new RequestBuilder(rootUrl, getExpiringContracts.PATH, 'get');
   if (params) {
-    rb.query('arg0', params.arg0, {});
+    rb.query('days', params.days, {});
   }
 
   return http.request(
