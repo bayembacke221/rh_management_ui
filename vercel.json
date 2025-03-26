@@ -1,9 +1,18 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/rh_management_ui/browser"
+      }
+    }
   ],
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/rh_management_ui",
-  "installCommand": "npm install",
-  "framework": "angular"
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
 }
