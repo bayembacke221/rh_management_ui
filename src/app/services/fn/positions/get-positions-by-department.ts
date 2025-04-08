@@ -10,11 +10,13 @@ import { RequestBuilder } from '../../request-builder';
 
 
 export interface GetPositionsByDepartment$Params {
+  departmentId: number | string;
 }
 
 export function getPositionsByDepartment(http: HttpClient, rootUrl: string, params?: GetPositionsByDepartment$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
   const rb = new RequestBuilder(rootUrl, getPositionsByDepartment.PATH, 'get');
   if (params) {
+    rb.path('departmentId', params.departmentId);
   }
 
   return http.request(

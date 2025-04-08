@@ -166,17 +166,19 @@ export class EmployeeFormComponent implements OnInit {
     // Filter positions based on selected department
     this.employeeForm.get('departementId')?.valueChanges.subscribe(departmentId => {
       if (departmentId) {
-        // Correction: le service retourne une chaîne, il faut probablement parser le JSON
-        this.positionsService.getPositionsByDepartment({ departmentId }).subscribe(positionsStr => {
-          try {
-            // On suppose que la chaîne est un JSON qu'il faut parser
-            const positionsData = JSON.parse(positionsStr);
-            this.positions = Array.isArray(positionsData) ? positionsData : [];
-          } catch (error) {
-            console.error('Erreur lors du parsing des positions', error);
+        this.positionsService.getPositionsByDepartment({ departmentId }).subscribe(positions => {
+
+          if (Array.isArray(positions)) {
+            this.positions = positions;
+          } else if (positions && typeof positions === 'object') {
+            const positionsObj = positions as { content?: PositionDto[] };
+            this.positions = positionsObj.content || [];
+          } else {
             this.positions = [];
           }
         });
+      } else {
+        this.positions = [];
       }
     });
   }
