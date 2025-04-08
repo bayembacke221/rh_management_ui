@@ -11,11 +11,13 @@ import { RequestBuilder } from '../../request-builder';
 import { ContractDto } from '../../models/contract-dto';
 
 export interface GetEmployeeContracts$Params {
+  employeeId: number | string;
 }
 
 export function getEmployeeContracts(http: HttpClient, rootUrl: string, params?: GetEmployeeContracts$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ContractDto>>> {
   const rb = new RequestBuilder(rootUrl, getEmployeeContracts.PATH, 'get');
   if (params) {
+    rb.path('employeeId', params.employeeId);
   }
 
   return http.request(

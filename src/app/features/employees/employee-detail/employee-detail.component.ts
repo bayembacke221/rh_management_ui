@@ -61,7 +61,7 @@ export class EmployeeDetailComponent implements OnInit {
           return of(null);
         })
       ),
-      contracts: this.contractsService.getEmployeeContracts({ employeeId }).pipe(
+      contracts: this.contractsService.getEmployeeContracts({ employeeId: employeeId }).pipe(
         catchError(error => {
           console.error('Erreur lors du chargement des contrats', error);
           return of([]);
