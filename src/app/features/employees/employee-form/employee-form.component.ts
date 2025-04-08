@@ -104,15 +104,17 @@ export class EmployeeFormComponent implements OnInit {
     this.loading = true;
 
     const pageable = { page: 0, size: 100, sort: ['name,asc'] };
+    const pageable2 = { page: 0, size: 100, sort: ['title,asc'] };
+    const pageable3 = { page: 0, size: 100, sort: ['firstName,asc'] };
 
     forkJoin({
       departments: this.departementsService.getAllDepartements({ arg0: pageable }).pipe(
         catchError(() => of({ content: [] } as PageDepartementDto))
       ),
-      positions: this.positionsService.getAllPositions({ arg0: pageable }).pipe(
+      positions: this.positionsService.getAllPositions({ arg0: pageable2 }).pipe(
         catchError(() => of({ content: [] } as Page))
       ),
-      managers: this.employeeService.getAllEmployees({ arg0: pageable }).pipe(
+      managers: this.employeeService.getAllEmployees({ arg0: pageable3 }).pipe(
         catchError(() => of({ content: [] } as PageEmployeeDto))
       )
     }).subscribe(results => {
