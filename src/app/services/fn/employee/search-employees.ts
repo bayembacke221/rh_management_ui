@@ -12,19 +12,19 @@ import { Pageable } from '../../models/pageable';
 import { PageEmployeeDto } from '../../models/page-employee-dto';
 
 export interface SearchEmployees$Params {
-  arg0?: string;
-  arg1?: 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
-  arg2?: number;
-  arg3: Pageable;
+  keyword?: string;
+  status?: 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
+  departmentId?: number;
+  pageable: Pageable;
 }
 
 export function searchEmployees(http: HttpClient, rootUrl: string, params: SearchEmployees$Params, context?: HttpContext): Observable<StrictHttpResponse<PageEmployeeDto>> {
   const rb = new RequestBuilder(rootUrl, searchEmployees.PATH, 'get');
   if (params) {
-    rb.query('arg0', params.arg0, {});
-    rb.query('arg1', params.arg1, {});
-    rb.query('arg2', params.arg2, {});
-    rb.query('arg3', params.arg3, {});
+    rb.query('keyword', params.keyword, {});
+    rb.query('status', params.status, {});
+    rb.query('departmentId', params.departmentId, {});
+    rb.query('pageable', params.pageable, {});
   }
 
   return http.request(

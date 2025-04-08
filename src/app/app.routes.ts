@@ -21,10 +21,10 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
-      // {
-      //   path: 'employees',
-      //   loadChildren: () => import('./features/employees/employees.routes').then(r => r.EMPLOYEE_ROUTES)
-      // },
+      {
+        path: 'employees',
+        loadChildren: () => import('./features/employees/employees.routes').then(r => r.EMPLOYEE_ROUTES)
+      },
       // {
       //   path: 'departments',
       //   loadChildren: () => import('./features/departments/departments.routes').then(r => r.DEPARTMENT_ROUTES)

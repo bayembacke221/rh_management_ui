@@ -1,0 +1,36 @@
+.org-chart {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.org-chart-container {
+  min-width: 100%;
+  padding: 20px;
+}
+
+.org-chart-nodes {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.org-chart-node {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.org-chart-node:last-child {
+  margin-bottom: 0;
+}
+
+.org-chart-children {
+  border-left: 2px dashed #d1d5db;
+  padding-left: 16px;
+}
+
+@media (min-width: 768px) {
+  .org-chart-node {
+    width: 100%;
+    max-width: 400px;
+  }
+}

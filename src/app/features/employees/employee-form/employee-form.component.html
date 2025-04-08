@@ -1,0 +1,247 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="md:flex md:items-center md:justify-between mb-6">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          {{ isEditMode ? 'Modifier l\'employé' : 'Ajouter un nouvel employé' }}
+        </h2>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-4">
+        <a routerLink="/employees/list" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Retour à la liste
+        </a>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="error" class="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-red-700">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div *ngIf="successMessage" class="mb-4 bg-green-50 border-l-4 border-green-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-green-700">{{ successMessage }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Employee Form -->
+    <div *ngIf="!loading" class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+        <div class="px-4 py-5 sm:p-6">
+          <!-- Form sections -->
+          <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <h3 class="sm:col-span-6 text-lg font-medium text-gray-900 border-b pb-2">Informations personnelles</h3>
+
+            <!-- First name & Last name -->
+            <div class="sm:col-span-3">
+              <label for="firstName" class="block text-sm font-medium text-gray-700">Prénom *</label>
+              <div class="mt-1">
+                <input type="text" id="firstName" formControlName="firstName" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['firstName'].invalid && f['firstName'].touched}">
+              </div>
+              <div *ngIf="f['firstName'].invalid && f['firstName'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['firstName'].errors?.['required']">Le prénom est requis</div>
+                <div *ngIf="f['firstName'].errors?.['minlength']">Le prénom doit contenir au moins 2 caractères</div>
+                <div *ngIf="f['firstName'].errors?.['maxlength']">Le prénom ne peut pas dépasser 50 caractères</div>
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label for="lastName" class="block text-sm font-medium text-gray-700">Nom *</label>
+              <div class="mt-1">
+                <input type="text" id="lastName" formControlName="lastName" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['lastName'].invalid && f['lastName'].touched}">
+              </div>
+              <div *ngIf="f['lastName'].invalid && f['lastName'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['lastName'].errors?.['required']">Le nom est requis</div>
+                <div *ngIf="f['lastName'].errors?.['minlength']">Le nom doit contenir au moins 2 caractères</div>
+                <div *ngIf="f['lastName'].errors?.['maxlength']">Le nom ne peut pas dépasser 50 caractères</div>
+              </div>
+            </div>
+
+            <!-- Phone & Email -->
+            <div class="sm:col-span-3">
+              <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
+              <div class="mt-1">
+                <input type="tel" id="phone" formControlName="phone" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['phone'].invalid && f['phone'].touched}">
+              </div>
+              <div *ngIf="f['phone'].invalid && f['phone'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['phone'].errors?.['pattern']">Format de téléphone invalide (10 chiffres)</div>
+              </div>
+            </div>
+            <!-- Birth date & Gender -->
+            <div class="sm:col-span-3">
+              <label for="birthDate" class="block text-sm font-medium text-gray-700">Date de naissance</label>
+              <div class="mt-1">
+                <input type="date" id="birthDate" formControlName="birthDate" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label for="gender" class="block text-sm font-medium text-gray-700">Genre *</label>
+              <div class="mt-1">
+                <select id="gender" formControlName="gender" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['gender'].invalid && f['gender'].touched}">
+                  <option value="">Sélectionner</option>
+                  <option *ngFor="let gender of genders" [value]="gender">{{gender}}</option>
+                </select>
+              </div>
+              <div *ngIf="f['gender'].invalid && f['gender'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['gender'].errors?.['required']">Le genre est requis</div>
+              </div>
+            </div>
+
+            <!-- Address & City -->
+            <div class="sm:col-span-4">
+              <label for="address" class="block text-sm font-medium text-gray-700">Adresse</label>
+              <div class="mt-1">
+                <input type="text" id="address" formControlName="address" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label for="city" class="block text-sm font-medium text-gray-700">Ville</label>
+              <div class="mt-1">
+                <input type="text" id="city" formControlName="city" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <!-- Social Security Number -->
+            <div class="sm:col-span-3">
+              <label for="socialSecurityNumber" class="block text-sm font-medium text-gray-700">Numéro de sécurité sociale</label>
+              <div class="mt-1">
+                <input type="text" id="socialSecurityNumber" formControlName="socialSecurityNumber" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <!-- Bank Account Info -->
+            <div class="sm:col-span-3">
+              <label for="bankAccountInfo" class="block text-sm font-medium text-gray-700">Informations bancaires</label>
+              <div class="mt-1">
+                <input type="text" id="bankAccountInfo" formControlName="bankAccountInfo" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="sm:col-span-3">
+              <label for="emergencyContactName" class="block text-sm font-medium text-gray-700">Contact d'urgence</label>
+              <div class="mt-1">
+                <input type="text" id="emergencyContactName" formControlName="emergencyContactName" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label for="emergencyContactPhone" class="block text-sm font-medium text-gray-700">Téléphone d'urgence</label>
+              <div class="mt-1">
+                <input type="tel" id="emergencyContactPhone" formControlName="emergencyContactPhone" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['emergencyContactPhone'].invalid && f['emergencyContactPhone'].touched}">
+              </div>
+              <div *ngIf="f['emergencyContactPhone'].invalid && f['emergencyContactPhone'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['emergencyContactPhone'].errors?.['pattern']">Format de téléphone invalide (10 chiffres)</div>
+              </div>
+            </div>
+
+            <!-- Professional Information Section -->
+            <h3 class="sm:col-span-6 text-lg font-medium text-gray-900 border-b pb-2 pt-4">Informations professionnelles</h3>
+
+            <!-- Hire Date & End Date -->
+            <div class="sm:col-span-3">
+              <label for="hireDate" class="block text-sm font-medium text-gray-700">Date d'embauche *</label>
+              <div class="mt-1">
+                <input type="date" id="hireDate" formControlName="hireDate" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['hireDate'].invalid && f['hireDate'].touched}">
+              </div>
+              <div *ngIf="f['hireDate'].invalid && f['hireDate'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['hireDate'].errors?.['required']">La date d'embauche est requise</div>
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label for="endDate" class="block text-sm font-medium text-gray-700">Date de fin</label>
+              <div class="mt-1">
+                <input type="date" id="endDate" formControlName="endDate" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="sm:col-span-3">
+              <label for="status" class="block text-sm font-medium text-gray-700">Statut *</label>
+              <div class="mt-1">
+                <select id="status" formControlName="status" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['status'].invalid && f['status'].touched}">
+                  <option *ngFor="let status of statuses" [value]="status">{{status}}</option>
+                </select>
+              </div>
+              <div *ngIf="f['status'].invalid && f['status'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['status'].errors?.['required']">Le statut est requis</div>
+              </div>
+            </div>
+
+            <!-- Department -->
+            <div class="sm:col-span-3">
+              <label for="departementId" class="block text-sm font-medium text-gray-700">Département</label>
+              <div class="mt-1">
+                <select id="departementId" formControlName="departementId" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                  <option value="">Sélectionner</option>
+                  <option *ngFor="let dept of departments" [value]="dept.id">{{dept.name}}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Position -->
+            <div class="sm:col-span-3">
+              <label for="positionId" class="block text-sm font-medium text-gray-700">Poste</label>
+              <div class="mt-1">
+                <select id="positionId" formControlName="positionId" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                  <option value="">Sélectionner</option>
+                  <option *ngFor="let position of positions" [value]="position.id">{{position.title}}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Manager -->
+            <div class="sm:col-span-3">
+              <label for="managerId" class="block text-sm font-medium text-gray-700">Manager</label>
+              <div class="mt-1">
+                <select id="managerId" formControlName="managerId" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                  <option value="">Sélectionner</option>
+                  <option *ngFor="let manager of managers" [value]="manager.id">{{manager.firstName}} {{manager.lastName}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form actions -->
+        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 flex justify-end space-x-3">
+          <button type="button" (click)="resetForm()" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Réinitialiser
+          </button>
+          <button type="submit" [disabled]="submitting" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" [ngClass]="{'opacity-70 cursor-not-allowed': submitting}">
+            <svg *ngIf="submitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

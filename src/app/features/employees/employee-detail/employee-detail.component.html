@@ -1,0 +1,449 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <p class="mt-4 text-gray-600">Chargement des informations de l'employé...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ error }}</p>
+        <div class="mt-2">
+          <button (click)="loadEmployeeData(employeeId)" class="text-sm font-medium text-red-600 hover:text-red-500">
+            Réessayer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content when loaded -->
+  <div *ngIf="!loading && !error && employee">
+    <!-- Header with employee info and actions -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+        <div class="flex items-center">
+          <img class="h-16 w-16 rounded-full mr-4"
+               src="https://ui-avatars.com/api/?name={{employee.firstName}}+{{employee.lastName}}&background=0D8ABC&color=fff"
+               alt="Photo de profil">
+          <div>
+            <h3 class="text-2xl font-bold text-gray-900">
+              {{employee.firstName}} {{employee.lastName}}
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+              {{employee.position?.title}} - {{employee.departement?.name}}
+            </p>
+            <div class="mt-1">
+              <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+                    [ngClass]="getStatusClass(employee.status ?? '')">
+                  {{employee.status ?? ''}}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="flex space-x-3">
+          <a [routerLink]="['/employees/edit', employee.id]" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+              <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+            </svg>
+            Modifier
+          </a>
+          <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            Ajouter un document
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+          <button (click)="setActiveTab('info')"
+                  class="py-4 px-1 border-b-2 font-medium text-sm"
+                  [class.border-blue-500]="activeTab === 'info'"
+                  [class.text-blue-600]="activeTab === 'info'"
+                  [class.border-transparent]="activeTab !== 'info'"
+                  [class.text-gray-500]="activeTab !== 'info'"
+                  [class.hover:text-gray-700]="activeTab !== 'info'"
+                  [class.hover:border-gray-300]="activeTab !== 'info'">
+            Informations
+          </button>
+          <button (click)="setActiveTab('contracts')"
+                  class="py-4 px-1 border-b-2 font-medium text-sm"
+                  [class.border-blue-500]="activeTab === 'contracts'"
+                  [class.text-blue-600]="activeTab === 'contracts'"
+                  [class.border-transparent]="activeTab !== 'contracts'"
+                  [class.text-gray-500]="activeTab !== 'contracts'"
+                  [class.hover:text-gray-700]="activeTab !== 'contracts'"
+                  [class.hover:border-gray-300]="activeTab !== 'contracts'">
+            Contrats
+            <span *ngIf="contracts.length > 0" class="ml-2 py-0.5 px-2.5 rounded-full text-xs bg-blue-100 text-blue-800">
+              {{contracts.length}}
+            </span>
+          </button>
+          <button (click)="setActiveTab('documents')"
+                  class="py-4 px-1 border-b-2 font-medium text-sm"
+                  [class.border-blue-500]="activeTab === 'documents'"
+                  [class.text-blue-600]="activeTab === 'documents'"
+                  [class.border-transparent]="activeTab !== 'documents'"
+                  [class.text-gray-500]="activeTab !== 'documents'"
+                  [class.hover:text-gray-700]="activeTab !== 'documents'"
+                  [class.hover:border-gray-300]="activeTab !== 'documents'">
+            Documents
+            <span *ngIf="documents.length > 0" class="ml-2 py-0.5 px-2.5 rounded-full text-xs bg-blue-100 text-blue-800">
+              {{documents.length}}
+            </span>
+          </button>
+          <button (click)="setActiveTab('history')"
+                  class="py-4 px-1 border-b-2 font-medium text-sm"
+                  [class.border-blue-500]="activeTab === 'history'"
+                  [class.text-blue-600]="activeTab === 'history'"
+                  [class.border-transparent]="activeTab !== 'history'"
+                  [class.text-gray-500]="activeTab !== 'history'"
+                  [class.hover:text-gray-700]="activeTab !== 'history'"
+                  [class.hover:border-gray-300]="activeTab !== 'history'">
+            Historique
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab content -->
+      <div class="px-4 py-5 sm:p-6">
+        <!-- Info tab -->
+        <div *ngIf="activeTab === 'info'" class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+          <div class="sm:col-span-3">
+            <div class="mb-6">
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Informations personnelles</h3>
+              <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Prénom</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.firstName}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Nom</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.lastName}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Date de naissance</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{formatDate(employee.birthDate)}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Genre</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.gender}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Téléphone</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.phone || '-'}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Sécurité sociale</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.socialSecurityNumber || '-'}}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Urgence</h3>
+              <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Contact d'urgence</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.emergencyContactName || '-'}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Téléphone d'urgence</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.emergencyContactPhone || '-'}}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <div class="mb-6">
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Informations professionnelles</h3>
+              <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Date d'embauche</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{formatDate(employee.hireDate)}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Date de fin</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{formatDate(employee.endDate) || '-'}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Poste</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.position?.title || '-'}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Département</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.departement?.name || '-'}}</dd>
+                </div>
+                <div class="sm:col-span-2">
+                  <dt class="text-sm font-medium text-gray-500">Manager</dt>
+                  <dd *ngIf="employee.manager" class="mt-1 text-sm text-gray-900">
+                    <div class="flex items-center">
+                      <img class="h-8 w-8 rounded-full mr-2"
+                           src="https://ui-avatars.com/api/?name={{employee.manager.firstName}}+{{employee.manager.lastName}}&background=0D8ABC&color=fff"
+                           alt="Manager">
+                      <a [routerLink]="['/employees/view', employee.manager.id]" class="text-blue-600 hover:text-blue-800">
+                        {{employee.manager.firstName}} {{employee.manager.lastName}}
+                      </a>
+                    </div>
+                  </dd>
+                  <dd *ngIf="!employee.manager" class="mt-1 text-sm text-gray-900">-</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Adresse</h3>
+              <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                  <dt class="text-sm font-medium text-gray-500">Adresse</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.address || '-'}}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500">Ville</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{employee.city || '-'}}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contracts tab -->
+        <div *ngIf="activeTab === 'contracts'">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Contrats</h3>
+            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <svg class="-ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              Ajouter un contrat
+            </button>
+          </div>
+
+          <!-- Empty state -->
+          <div *ngIf="contracts.length === 0" class="text-center py-12 bg-gray-50 rounded-lg">
+            <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun contrat</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Ajoutez un contrat pour cet employé.
+            </p>
+          </div>
+
+          <!-- Contract list -->
+          <div *ngIf="contracts.length > 0" class="overflow-hidden bg-white shadow sm:rounded-md">
+            <ul role="list" class="divide-y divide-gray-200">
+              <li *ngFor="let contract of contracts">
+                <div class="block hover:bg-gray-50">
+                  <div class="flex items-center px-4 py-4 sm:px-6">
+                    <div class="min-w-0 flex-1 flex items-center">
+                      <div class="flex-shrink-0">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                          <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="min-w-0 flex-1 px-4">
+                        <div>
+                          <p class="text-sm font-medium text-blue-600 truncate">
+                            Contrat - {{contract.type}}
+                          </p>
+                          <p class="mt-1 flex text-sm text-gray-500">
+                            <span class="truncate">Du {{formatDate(contract.startDate)}}</span>
+                            <span class="ml-1 flex-shrink-0">au {{formatDate(contract.endDate) || 'indéterminé'}}</span>
+                          </p>
+                          <div class="mt-2 flex">
+                            <div>
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                    [ngClass]="getContractStatusClass(contract.status ?? '')">
+                                {{contract.status}}
+                              </span>
+                            </div>
+                            <div class="ml-6">
+                              <div class="flex items-center text-sm text-gray-500">
+                                <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                </svg>
+                                Salaire: {{contract.salary | currency:'EUR'}}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <button class="p-2 text-blue-600 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Documents tab -->
+        <div *ngIf="activeTab === 'documents'">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Documents</h3>
+            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <svg class="-ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              Ajouter un document
+            </button>
+          </div>
+
+          <!-- Empty state -->
+          <div *ngIf="documents.length === 0" class="text-center py-12 bg-gray-50 rounded-lg">
+            <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun document</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Ajoutez des documents pour cet employé.
+            </p>
+          </div>
+
+          <!-- Document grid -->
+          <div *ngIf="documents.length > 0" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div *ngFor="let document of documents" class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+              <div class="flex-shrink-0">
+                <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                  <svg class="h-6 w-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getDocumentTypeIcon(document.type ?? 'OTHER')" />
+                  </svg>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <a href="#" class="focus:outline-none">
+                  <span class="absolute inset-0" aria-hidden="true"></span>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{document.name}}
+                  </p>
+                  <p class="text-sm text-gray-500 truncate">
+                    {{document.type}} · {{formatDate(document.uploadDate)}}
+                  </p>
+                </a>
+              </div>
+              <button (click)="downloadDocument(document.id!)" class="p-2 text-blue-600 hover:text-blue-900 focus:outline-none">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- History tab -->
+        <div *ngIf="activeTab === 'history'">
+          <div class="mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Historique de l'employé</h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+              Historique des modifications apportées à cet employé.
+            </p>
+          </div>
+
+          <!-- Timeline -->
+          <div class="flow-root">
+            <ul role="list" class="-mb-8">
+              <li>
+                <div class="relative pb-8">
+                  <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                  <div class="relative flex items-start space-x-3">
+                    <div class="relative">
+                      <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                        <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <div class="text-sm">
+                          <span class="font-medium text-gray-900">Embauche</span>
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-500">
+                          Embauché le {{formatDate(employee.hireDate)}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <!-- Exemple de contrat -->
+              <li *ngIf="contracts.length > 0">
+                <div class="relative pb-8">
+                  <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                  <div class="relative flex items-start space-x-3">
+                    <div class="relative">
+                      <div class="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                        <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <div class="text-sm">
+                          <span class="font-medium text-gray-900">Contrat {{contracts[0].type}}</span>
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-500">
+                          Contrat signé le {{formatDate(contracts[0].startDate)}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <!-- Si employé terminé -->
+              <li *ngIf="employee.endDate">
+                <div class="relative pb-8">
+                  <div class="relative flex items-start space-x-3">
+                    <div class="relative">
+                      <div class="h-10 w-10 rounded-full bg-red-500 flex items-center justify-center ring-8 ring-white">
+                        <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <div class="text-sm">
+                          <span class="font-medium text-gray-900">Fin de contrat</span>
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-500">
+                          Contrat terminé le {{formatDate(employee.endDate)}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
