@@ -163,7 +163,6 @@ export class EmployeeFormComponent implements OnInit {
   }
 
   setupDependentDropdowns(): void {
-    // Filter positions based on selected department
     this.employeeForm.get('departementId')?.valueChanges.subscribe(departmentId => {
       if (departmentId) {
         this.positionsService.getPositionsByDepartment({ departmentId }).subscribe(positions => {
