@@ -1,0 +1,160 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <p class="mt-4 text-gray-600">Chargement des informations du poste...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ error }}</p>
+        <div class="mt-2">
+          <button (click)="loadPositionData(positionId)" class="text-sm font-medium text-red-600 hover:text-red-500">
+            Réessayer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content when loaded -->
+  <div *ngIf="!loading && !error && position">
+    <!-- Header with position info and actions -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+        <div>
+          <div class="flex items-center">
+            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">
+                {{position.title}}
+              </h3>
+              <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                {{position.department?.name || 'Aucun département'}} - Grade {{position.grade}}
+              </p>
+              <div class="mt-1">
+                <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+                      [ngClass]="position.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                  {{position.active ? 'Actif' : 'Inactif'}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex space-x-3">
+          <a [routerLink]="['/positions/edit', position.id]" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+              <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+            </svg>
+            Modifier
+          </a>
+          <button (click)="togglePositionStatus()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm-1-5h2v2H9v-2zm0-6h2v4H9V5z" clip-rule="evenodd" />
+            </svg>
+            {{position.active ? 'Désactiver' : 'Activer'}}
+          </button>
+          <button (click)="deletePosition()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            Supprimer
+          </button>
+        </div>
+      </div>
+
+      <!-- Position details -->
+      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Titre</dt>
+            <dd class="mt-1 text-sm text-gray-900">{{position.title}}</dd>
+          </div>
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Grade</dt>
+            <dd class="mt-1 text-sm text-gray-900">{{position.grade}}</dd>
+          </div>
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Département</dt>
+            <dd class="mt-1 text-sm text-gray-900">{{position.department?.name || 'Non assigné'}}</dd>
+          </div>
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Plage salariale</dt>
+            <dd class="mt-1 text-sm text-gray-900">{{formatSalaryRange(position.minSalary, position.maxSalary)}}</dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-medium text-gray-500">Description</dt>
+            <dd class="mt-1 text-sm text-gray-900">{{position.description || 'Aucune description disponible'}}</dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-medium text-gray-500">Responsabilités</dt>
+            <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{position.responsibilities || 'Aucune responsabilité spécifiée'}}</dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-medium text-gray-500">Exigences</dt>
+            <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{position.requirements || 'Aucune exigence spécifiée'}}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Employees in this position -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Employés à ce poste</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Liste des employés occupant actuellement ce poste</p>
+      </div>
+      <div class="border-t border-gray-200">
+        <div *ngIf="employees.length === 0" class="px-4 py-5 sm:p-6 text-center text-gray-500">
+          Aucun employé n'occupe actuellement ce poste
+        </div>
+        <ul *ngIf="employees.length > 0" role="list" class="divide-y divide-gray-200">
+          <li *ngFor="let employee of employees" class="px-4 py-4 sm:px-6 hover:bg-gray-50">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10">
+                <img class="h-10 w-10 rounded-full"
+                     src="https://ui-avatars.com/api/?name={{employee.firstName}}+{{employee.lastName}}&background=0D8ABC&color=fff"
+                     alt="Photo de profil">
+              </div>
+              <div class="ml-4 flex-1">
+                <div class="flex justify-between">
+                  <div>
+                    <a [routerLink]="['/employees/view', employee.id]" class="text-sm font-medium text-blue-600 hover:text-blue-900">
+                      {{employee.firstName}} {{employee.lastName}}
+                    </a>
+                    <div class="text-sm text-gray-500">
+                      {{employee.departement?.name || 'Non assigné'}}
+                    </div>
+                  </div>
+                  <div>
+                    <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+                          [ngClass]="{
+                            'bg-green-100 text-green-800': employee.status === 'ACTIVE',
+                            'bg-yellow-100 text-yellow-800': employee.status === 'ON_LEAVE',
+                            'bg-gray-100 text-gray-800': employee.status === 'INACTIVE',
+                            'bg-red-100 text-red-800': employee.status === 'TERMINATED'
+                          }">
+                      {{employee.status}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

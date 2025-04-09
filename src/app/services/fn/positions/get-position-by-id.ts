@@ -11,11 +11,13 @@ import { RequestBuilder } from '../../request-builder';
 import { PositionDto } from '../../models/position-dto';
 
 export interface GetPositionById$Params {
+  id: number | string;
 }
 
 export function getPositionById(http: HttpClient, rootUrl: string, params?: GetPositionById$Params, context?: HttpContext): Observable<StrictHttpResponse<PositionDto>> {
   const rb = new RequestBuilder(rootUrl, getPositionById.PATH, 'get');
   if (params) {
+    rb.path('id', params.id, {});
   }
 
   return http.request(
