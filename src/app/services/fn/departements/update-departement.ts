@@ -12,6 +12,7 @@ import { DepartementDto } from '../../models/departement-dto';
 import { DepartementUpdateDto } from '../../models/departement-update-dto';
 
 export interface UpdateDepartement$Params {
+  id: number | string;
       body: DepartementUpdateDto
 }
 
@@ -19,6 +20,7 @@ export function updateDepartement(http: HttpClient, rootUrl: string, params: Upd
   const rb = new RequestBuilder(rootUrl, updateDepartement.PATH, 'put');
   if (params) {
     rb.body(params.body, 'application/json');
+    rb.path('id', params.id, {});
   }
 
   return http.request(

@@ -11,11 +11,13 @@ import { RequestBuilder } from '../../request-builder';
 import { DepartementDto } from '../../models/departement-dto';
 
 export interface GetSubDepartements$Params {
+  id: number | string;
 }
 
 export function getSubDepartements(http: HttpClient, rootUrl: string, params?: GetSubDepartements$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<DepartementDto>>> {
   const rb = new RequestBuilder(rootUrl, getSubDepartements.PATH, 'get');
   if (params) {
+    rb.path('id', params.id, {});
   }
 
   return http.request(

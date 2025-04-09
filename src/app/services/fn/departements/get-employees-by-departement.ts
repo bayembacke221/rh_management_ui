@@ -12,6 +12,7 @@ import { Pageable } from '../../models/pageable';
 import { PageEmployeeShortDto } from '../../models/page-employee-short-dto';
 
 export interface GetEmployeesByDepartement$Params {
+  id: number | string;
   arg1: Pageable;
 }
 
@@ -19,6 +20,7 @@ export function getEmployeesByDepartement(http: HttpClient, rootUrl: string, par
   const rb = new RequestBuilder(rootUrl, getEmployeesByDepartement.PATH, 'get');
   if (params) {
     rb.query('arg1', params.arg1, {});
+    rb.path('id', params.id, {});
   }
 
   return http.request(

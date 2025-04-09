@@ -16,12 +16,14 @@ export interface UpdateDepartementStatus$Params {
  * Statut actif (true/false)
  */
   arg1: boolean;
+  id: number | string;
 }
 
 export function updateDepartementStatus(http: HttpClient, rootUrl: string, params: UpdateDepartementStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<DepartementDto>> {
   const rb = new RequestBuilder(rootUrl, updateDepartementStatus.PATH, 'patch');
   if (params) {
     rb.query('arg1', params.arg1, {});
+    rb.path('id', params.id, {});
   }
 
   return http.request(
