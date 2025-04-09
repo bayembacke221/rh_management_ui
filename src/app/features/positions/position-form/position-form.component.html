@@ -1,0 +1,194 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="md:flex md:items-center md:justify-between mb-6">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          {{ isEditMode ? 'Modifier le poste' : 'Ajouter un nouveau poste' }}
+        </h2>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-4">
+        <a routerLink="/positions/list" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Retour à la liste
+        </a>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="error" class="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-red-700">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div *ngIf="successMessage" class="mb-4 bg-green-50 border-l-4 border-green-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-green-700">{{ successMessage }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Position Form -->
+    <div *ngIf="!loading" class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <form [formGroup]="positionForm" (ngSubmit)="onSubmit()">
+        <div class="px-4 py-5 sm:p-6">
+          <!-- Form sections -->
+          <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <h3 class="sm:col-span-6 text-lg font-medium text-gray-900 border-b pb-2">Informations générales</h3>
+
+            <!-- Title -->
+            <div class="sm:col-span-3">
+              <label for="title" class="block text-sm font-medium text-gray-700">Titre du poste *</label>
+              <div class="mt-1">
+                <input type="text" id="title" formControlName="title" (blur)="checkTitleExists()" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['title'].invalid && f['title'].touched}">
+              </div>
+              <div *ngIf="f['title'].invalid && f['title'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['title'].errors?.['required']">Le titre est requis</div>
+                <div *ngIf="f['title'].errors?.['minlength']">Le titre doit contenir au moins 2 caractères</div>
+                <div *ngIf="f['title'].errors?.['maxlength']">Le titre ne peut pas dépasser 100 caractères</div>
+                <div *ngIf="f['title'].errors?.['titleExists']">Ce titre de poste existe déjà</div>
+              </div>
+            </div>
+
+            <!-- Grade -->
+            <div class="sm:col-span-3">
+              <label for="grade" class="block text-sm font-medium text-gray-700">Grade *</label>
+              <div class="mt-1">
+                <input type="text" id="grade" formControlName="grade" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['grade'].invalid && f['grade'].touched}">
+              </div>
+              <div *ngIf="f['grade'].invalid && f['grade'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['grade'].errors?.['required']">Le grade est requis</div>
+                <div *ngIf="f['grade'].errors?.['minlength']">Le grade doit contenir au moins 1 caractère</div>
+                <div *ngIf="f['grade'].errors?.['maxlength']">Le grade ne peut pas dépasser 10 caractères</div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="sm:col-span-6">
+              <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+              <div class="mt-1">
+                <textarea id="description" formControlName="description" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['description'].invalid && f['description'].touched}"></textarea>
+              </div>
+              <div *ngIf="f['description'].invalid && f['description'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['description'].errors?.['maxlength']">La description ne peut pas dépasser 500 caractères</div>
+              </div>
+            </div>
+
+            <!-- Department -->
+            <div class="sm:col-span-3">
+              <label for="departmentId" class="block text-sm font-medium text-gray-700">Département</label>
+              <div class="mt-1">
+                <select id="departmentId" formControlName="departmentId" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                  <option [ngValue]="null">Sélectionner</option>
+                  <option *ngFor="let dept of departments" [value]="dept.id">{{dept.name}}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Active Status -->
+            <div class="sm:col-span-3">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input id="active" formControlName="active" type="checkbox" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="active" class="font-medium text-gray-700">Poste actif</label>
+                  <p class="text-gray-500">Indique si ce poste est actuellement actif et peut être assigné à des employés</p>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="sm:col-span-6 text-lg font-medium text-gray-900 border-b pb-2 pt-4">Rémunération</h3>
+
+            <!-- Min Salary -->
+            <div class="sm:col-span-3">
+              <label for="minSalary" class="block text-sm font-medium text-gray-700">Salaire minimum *</label>
+              <div class="mt-1 relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-gray-500 sm:text-sm">€</span>
+                </div>
+                <input type="number" id="minSalary" formControlName="minSalary" class="pl-7 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['minSalary'].invalid && f['minSalary'].touched}">
+              </div>
+              <div *ngIf="f['minSalary'].invalid && f['minSalary'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['minSalary'].errors?.['required']">Le salaire minimum est requis</div>
+                <div *ngIf="f['minSalary'].errors?.['min']">Le salaire minimum doit être supérieur ou égal à 0</div>
+              </div>
+            </div>
+
+            <!-- Max Salary -->
+            <div class="sm:col-span-3">
+              <label for="maxSalary" class="block text-sm font-medium text-gray-700">Salaire maximum *</label>
+              <div class="mt-1 relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-gray-500 sm:text-sm">€</span>
+                </div>
+                <input type="number" id="maxSalary" formControlName="maxSalary" class="pl-7 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['maxSalary'].invalid && f['maxSalary'].touched}">
+              </div>
+              <div *ngIf="f['maxSalary'].invalid && f['maxSalary'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['maxSalary'].errors?.['required']">Le salaire maximum est requis</div>
+                <div *ngIf="f['maxSalary'].errors?.['min']">Le salaire maximum doit être supérieur ou égal à 0</div>
+                <div *ngIf="f['maxSalary'].errors?.['salaryRangeInvalid']">Le salaire maximum doit être supérieur au salaire minimum</div>
+              </div>
+            </div>
+
+            <h3 class="sm:col-span-6 text-lg font-medium text-gray-900 border-b pb-2 pt-4">Détails supplémentaires</h3>
+
+            <!-- Responsibilities -->
+            <div class="sm:col-span-6">
+              <label for="responsibilities" class="block text-sm font-medium text-gray-700">Responsabilités</label>
+              <div class="mt-1">
+                <textarea id="responsibilities" formControlName="responsibilities" rows="4" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['responsibilities'].invalid && f['responsibilities'].touched}"></textarea>
+              </div>
+              <div *ngIf="f['responsibilities'].invalid && f['responsibilities'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['responsibilities'].errors?.['maxlength']">Les responsabilités ne peuvent pas dépasser 1000 caractères</div>
+              </div>
+            </div>
+
+            <!-- Requirements -->
+            <div class="sm:col-span-6">
+              <label for="requirements" class="block text-sm font-medium text-gray-700">Exigences</label>
+              <div class="mt-1">
+                <textarea id="requirements" formControlName="requirements" rows="4" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{'border-red-300': f['requirements'].invalid && f['requirements'].touched}"></textarea>
+              </div>
+              <div *ngIf="f['requirements'].invalid && f['requirements'].touched" class="mt-1 text-sm text-red-600">
+                <div *ngIf="f['requirements'].errors?.['maxlength']">Les exigences ne peuvent pas dépasser 1000 caractères</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form actions -->
+        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 flex justify-end space-x-3">
+          <button type="button" (click)="resetForm()" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Réinitialiser
+          </button>
+          <button type="submit" [disabled]="submitting" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" [ngClass]="{'opacity-70 cursor-not-allowed': submitting}">
+            <svg *ngIf="submitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

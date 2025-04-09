@@ -16,12 +16,14 @@ export interface UpdatePositionStatus$Params {
  * Nouveau statut (true = actif, false = inactif)
  */
   arg1: boolean;
+  id: number | string;
 }
 
 export function updatePositionStatus(http: HttpClient, rootUrl: string, params: UpdatePositionStatus$Params, context?: HttpContext): Observable<StrictHttpResponse<PositionDto>> {
   const rb = new RequestBuilder(rootUrl, updatePositionStatus.PATH, 'patch');
   if (params) {
     rb.query('arg1', params.arg1, {});
+    rb.path('id', params.id, {});
   }
 
   return http.request(

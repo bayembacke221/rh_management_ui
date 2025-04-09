@@ -12,13 +12,15 @@ import { PositionDto } from '../../models/position-dto';
 import { PositionUpdateDto } from '../../models/position-update-dto';
 
 export interface UpdatePosition$Params {
-      body: PositionUpdateDto
+      body: PositionUpdateDto;
+      id: number|string;
 }
 
 export function updatePosition(http: HttpClient, rootUrl: string, params: UpdatePosition$Params, context?: HttpContext): Observable<StrictHttpResponse<PositionDto>> {
   const rb = new RequestBuilder(rootUrl, updatePosition.PATH, 'put');
   if (params) {
     rb.body(params.body, 'application/json');
+    rb.path('id', params.id, {});
   }
 
   return http.request(

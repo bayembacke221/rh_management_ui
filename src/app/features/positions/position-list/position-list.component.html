@@ -1,0 +1,227 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">Postes</h1>
+      <p class="mt-2 text-sm text-gray-700">Liste complète des postes disponibles dans l'entreprise</p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <a routerLink="/positions/create" class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto">
+        Ajouter un poste
+      </a>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="mt-6 bg-white shadow rounded-lg p-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+      <div>
+        <label for="search" class="block text-sm font-medium text-gray-700">Recherche</label>
+        <div class="mt-1">
+          <input type="text" [(ngModel)]="searchTerm" id="search" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Titre, description...">
+        </div>
+      </div>
+
+      <div>
+        <label for="department" class="block text-sm font-medium text-gray-700">Département</label>
+        <div class="mt-1">
+          <select [(ngModel)]="selectedDepartment" id="department" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+            <option value="">Tous les départements</option>
+            <option *ngFor="let dept of departments" [value]="dept.id">{{dept.name}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
+        <div class="mt-1">
+          <div class="flex items-center">
+            <input type="checkbox" [(ngModel)]="activeOnly" id="status" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+            <label for="status" class="ml-2 block text-sm text-gray-900">
+              Positions actives uniquement
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-end space-x-2">
+        <button (click)="applyFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+          </svg>
+          Filtrer
+        </button>
+        <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="mt-8 flex justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="mt-8 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading && !error && filteredPositions.length > 0" class="mt-8 flex flex-col">
+    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                Titre
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Département
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Grade
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Plage salariale
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Statut
+              </th>
+              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span class="sr-only">Actions</span>
+              </th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+            <tr *ngFor="let position of filteredPositions">
+              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                {{position.title || '-'}}
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                {{position.department?.name || '-'}}
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                {{position.grade || '-'}}
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                {{formatSalaryRange(position.minSalary, position.maxSalary)}}
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+                      [ngClass]="position.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                  {{position.active ? 'Actif' : 'Inactif'}}
+                </span>
+              </td>
+              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                <a [routerLink]="['/positions/view', position.id]" class="text-blue-600 hover:text-blue-900 mr-4">Voir</a>
+                <a [routerLink]="['/positions/edit', position.id]" class="text-blue-600 hover:text-blue-900 mr-4">Modifier</a>
+
+                <button (click)="togglePositionStatus(position)" class="text-blue-600 hover:text-blue-900 mr-4">
+                  {{position.active ? 'Désactiver' : 'Activer'}}
+                </button>
+
+                <button (click)="deletePosition(position)" class="text-red-600 hover:text-red-900">
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !error && filteredPositions.length === 0" class="mt-8 text-center py-12 bg-white rounded-lg shadow">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun poste trouvé</h3>
+    <p class="mt-1 text-sm text-gray-500">
+      Aucun poste ne correspond à vos critères de recherche.
+    </p>
+    <div class="mt-6">
+      <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && !error && totalItems > 0" class="mt-5 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+    <div class="flex flex-1 justify-between sm:hidden">
+      <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
+              class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              [class.opacity-50]="currentPage === 0"
+              [class.cursor-not-allowed]="currentPage === 0">
+        Précédent
+      </button>
+      <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
+              class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              [class.opacity-50]="currentPage === totalPages - 1"
+              [class.cursor-not-allowed]="currentPage === totalPages - 1">
+        Suivant
+      </button>
+    </div>
+    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700">
+          Affichage de <span class="font-medium">{{ currentPage * pageSize + 1 }}</span> à
+          <span class="font-medium">{{ Math.min((currentPage + 1) * pageSize, totalItems) }}</span> sur
+          <span class="font-medium">{{ totalItems }}</span> résultats
+        </p>
+      </div>
+      <div>
+        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+          <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
+                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                  [class.opacity-50]="currentPage === 0"
+                  [class.cursor-not-allowed]="currentPage === 0">
+            <span class="sr-only">Précédent</span>
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+            </svg>
+          </button>
+
+          <!-- Page numbers -->
+          <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+            <button (click)="changePage(i)"
+                    class="relative inline-flex items-center border border-gray-300 px-4 py-2 text-sm font-medium focus:z-20"
+                    [class.z-10]="currentPage === i"
+                    [class.bg-blue-50]="currentPage === i"
+                    [class.border-blue-500]="currentPage === i"
+                    [class.text-blue-600]="currentPage === i"
+                    [class.bg-white]="currentPage !== i"
+                    [class.text-gray-500]="currentPage !== i"
+                    [class.hover:bg-gray-50]="currentPage !== i">
+              {{ i + 1 }}
+            </button>
+          </ng-container>
+
+          <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
+                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                  [class.opacity-50]="currentPage === totalPages - 1"
+                  [class.cursor-not-allowed]="currentPage === totalPages - 1">
+            <span class="sr-only">Suivant</span>
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
