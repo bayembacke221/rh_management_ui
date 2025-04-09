@@ -14,6 +14,7 @@ interface OrgNode {
   img: string;
   children: OrgNode[];
   expanded?: boolean;
+  manager: string;
 }
 
 @Component({
@@ -46,7 +47,7 @@ export class OrgChartComponent implements OnInit {
   }
 
   loadDepartments(): void {
-    const pageable = { page: 0, size: 100, sort: ['name,asc'] };
+    const pageable = { page: 0, size: 10, sort: ['name,asc'] };
 
     this.departmentsService.getAllDepartements({arg0: pageable }).subscribe({
       next: (departments) => {
@@ -77,15 +78,23 @@ export class OrgChartComponent implements OnInit {
   }
 
   transformData(data: any[]): OrgNode[] {
-    return data.map(item => ({
-      id: item.id,
-      name: `${item.firstName} ${item.lastName}`,
-      title: item.position?.title || 'Non défini',
-      department: item.departement?.name || 'Non défini',
-      img: `https://ui-avatars.com/api/?name=${item.firstName}+${item.lastName}&background=0D8ABC&color=fff`,
-      children: item.subordinates ? this.transformData(item.subordinates) : [],
-      expanded: false
-    }));
+    return data.map(item => {
+      // Get manager name if available
+      const managerName = item.manager ?
+        `${item.manager.firstName} ${item.manager.lastName}` :
+        'Non assigné';
+
+      return {
+        id: item.id,
+        name: item.name, // Department name
+        title: item.code || 'Non défini', // Department code as title
+        department: item.active ? 'Actif' : 'Inactif',
+        img: `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=0D8ABC&color=fff`,
+        children: item.children && item.children.length > 0 ? this.transformData(item.children) : [],
+        expanded: false,
+        manager: managerName // Add manager information
+      };
+    });
   }
 
   toggleNode(node: OrgNode): void {
