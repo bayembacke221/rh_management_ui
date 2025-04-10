@@ -47,7 +47,7 @@ export class PositionListComponent implements OnInit {
 
   loadDepartments(): void {
     this.departmentsService.getAllDepartements({
-      arg0: {
+      pageable: {
         page: 0,
         size: 100,
         sort: []
@@ -68,10 +68,10 @@ export class PositionListComponent implements OnInit {
 
     // Utiliser le service de recherche pour plus de flexibilité
     this.positionsService.searchPositions({
-      arg0: this.searchTerm || undefined,
-      arg1: this.activeOnly || undefined,
-      arg2: this.selectedDepartment ? Number(this.selectedDepartment) : undefined,
-      arg3: {
+      keyword: this.searchTerm || undefined,
+      active: this.activeOnly || undefined,
+      departmentId: this.selectedDepartment ? Number(this.selectedDepartment) : undefined,
+      pageable: {
         page: this.currentPage,
         size: this.pageSize,
         sort: ['title,asc']
@@ -125,7 +125,7 @@ export class PositionListComponent implements OnInit {
     const newStatus = !position.active;
 
     this.positionsService.updatePositionStatus({
-      arg1: newStatus,
+      active: newStatus,
       id: position.id
     }).subscribe({
       next: (updatedPosition) => {
@@ -166,9 +166,9 @@ export class PositionListComponent implements OnInit {
 
   formatSalaryRange(min?: number, max?: number): string {
     if (min === undefined && max === undefined) return '-';
-    if (min === undefined) return `jusqu'à ${max} €`;
-    if (max === undefined) return `à partir de ${min} €`;
-    return `${min} € - ${max} €`;
+    if (min === undefined) return `jusqu'à ${max} FCFA`;
+    if (max === undefined) return `à partir de ${min} FCFA`;
+    return `${min} FCFA - ${max} FCFA`;
   }
 
   protected readonly Math = Math;

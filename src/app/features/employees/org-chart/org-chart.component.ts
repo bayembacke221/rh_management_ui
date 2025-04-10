@@ -49,7 +49,7 @@ export class OrgChartComponent implements OnInit {
   loadDepartments(): void {
     const pageable = { page: 0, size: 10, sort: ['name,asc'] };
 
-    this.departmentsService.getAllDepartements({arg0: pageable }).subscribe({
+    this.departmentsService.getAllDepartements({pageable: pageable }).subscribe({
       next: (departments) => {
         this.departments = departments?.content || [];
       },

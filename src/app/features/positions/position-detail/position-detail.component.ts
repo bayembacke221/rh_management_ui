@@ -93,7 +93,7 @@ export class PositionDetailComponent implements OnInit {
 
     this.positionsService.updatePositionStatus({
       id: this.position.id,
-      arg1: newStatus
+      active: newStatus
     }).subscribe({
       next: (updatedPosition) => {
         this.position = updatedPosition;

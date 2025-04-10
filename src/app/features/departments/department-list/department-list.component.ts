@@ -41,7 +41,7 @@ export class DepartmentListComponent implements OnInit {
     this.error = null;
 
     this.departmentsService.getAllDepartements({
-      arg0: {
+      pageable: {
         page: this.currentPage,
         size: this.pageSize,
         sort: ['name,asc']
@@ -103,7 +103,7 @@ export class DepartmentListComponent implements OnInit {
 
     this.departmentsService.updateDepartementStatus({
       id: department.id,
-      arg1: newStatus
+      active: newStatus
     }).subscribe({
       next: (updatedDept) => {
         const index = this.departments.findIndex(d => d.id === department.id);

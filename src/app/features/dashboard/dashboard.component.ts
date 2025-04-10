@@ -48,7 +48,6 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    // On utilise forkJoin pour faire plusieurs requêtes en parallèle
     forkJoin({
       activeEmployeeCount: this.employeeService.getActiveEmployeeCount(),
       recentHires: this.employeeService.getRecentHires(),
@@ -81,15 +80,15 @@ export class DashboardComponent implements OnInit {
   updateStatsCards(results: any): void {
     // Calculer les statistiques à partir des résultats
     const totalEmployees = results.activeEmployeeCount;
-    const pendingLeaves = 0; // À remplacer quand le service de congés sera implémenté
-    const attendanceRate = 95; // À remplacer par une donnée réelle
+    const pendingLeaves = 0;
+    const attendanceRate = 95;
     const recentHiresCount = results.recentHires.length;
 
     this.stats = [
       {
         title: 'Effectif total',
         value: totalEmployees.toString(),
-        change: '+12%', // À calculer en comparant avec la période précédente
+        change: '+12%',
         changeType: 'increase',
         icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
         bgColor: 'bg-blue-500'

@@ -82,7 +82,7 @@ export class PositionFormComponent implements OnInit {
   loadDepartments(): void {
     const pageable = {page: 0, size: 100, sort: ['name,asc']};
 
-    this.departementsService.getAllDepartements({arg0: pageable}).pipe(
+    this.departementsService.getAllDepartements({pageable: pageable}).pipe(
       catchError(() => of({content: []} as PageDepartementDto))
     ).subscribe(result => {
       this.departments = result?.content || [];
@@ -173,8 +173,8 @@ export class PositionFormComponent implements OnInit {
     const excludeId = this.isEditMode && this.positionId ? this.positionId : 0;
 
     this.positionsService.checkTitleExists({
-      arg0: title,
-      arg1: excludeId
+      title: title,
+      excludeId: excludeId
     }).subscribe(exists => {
       if (exists) {
         this.positionForm.get('title')?.setErrors({titleExists: true});

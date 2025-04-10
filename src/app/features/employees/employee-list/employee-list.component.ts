@@ -54,7 +54,7 @@ export class EmployeeListComponent implements OnInit {
 
   loadDepartments(): void {
     this.departmentsService.getAllDepartements({
-      arg0: {
+      pageable: {
         page: 0,
         size: 10,
         sort: []

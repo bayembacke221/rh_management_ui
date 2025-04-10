@@ -73,10 +73,10 @@ export class DepartmentFormComponent implements OnInit {
     const pageable2 = { page: 0, size: 100, sort: ['firstName,asc'] };
 
     forkJoin({
-      departments: this.departmentsService.getAllDepartements({ arg0: pageable }).pipe(
+      departments: this.departmentsService.getAllDepartements({ pageable: pageable }).pipe(
         catchError(() => of({ content: [] }))
       ),
-      employees: this.employeeService.getAllEmployees({ arg0: pageable2 }).pipe(
+      employees: this.employeeService.getAllEmployees({ pageable: pageable2 }).pipe(
         catchError(() => of({ content: [] }))
       )
     }).subscribe(results => {

@@ -64,7 +64,7 @@ export class DepartmentDetailComponent implements OnInit {
       ),
       employees: this.departmentsService.getEmployeesByDepartement({
         id: departmentId,
-        arg1: { page: 0, size: 20, sort: ['firstName,asc'] }
+        pageable: { page: 0, size: 20, sort: ['firstName,asc'] }
       }).pipe(
         catchError(error => {
           console.error('Erreur lors du chargement des employés', error);
@@ -97,7 +97,7 @@ export class DepartmentDetailComponent implements OnInit {
 
     this.departmentsService.updateDepartementStatus({
       id: this.department.id,
-      arg1: newStatus
+      active: newStatus
     }).subscribe({
       next: (updatedDept) => {
         this.department = updatedDept;

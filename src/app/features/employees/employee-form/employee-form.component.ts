@@ -108,13 +108,13 @@ export class EmployeeFormComponent implements OnInit {
     const pageable3 = { page: 0, size: 100, sort: ['firstName,asc'] };
 
     forkJoin({
-      departments: this.departementsService.getAllDepartements({ arg0: pageable }).pipe(
+      departments: this.departementsService.getAllDepartements({ pageable: pageable }).pipe(
         catchError(() => of({ content: [] } as PageDepartementDto))
       ),
-      positions: this.positionsService.getAllPositions({ arg0: pageable2 }).pipe(
+      positions: this.positionsService.getAllPositions({ pageable: pageable2 }).pipe(
         catchError(() => of({ content: [] } as Page))
       ),
-      managers: this.employeeService.getAllEmployees({ arg0: pageable3 }).pipe(
+      managers: this.employeeService.getAllEmployees({ pageable: pageable3 }).pipe(
         catchError(() => of({ content: [] } as PageEmployeeDto))
       )
     }).subscribe(results => {
@@ -204,6 +204,7 @@ export class EmployeeFormComponent implements OnInit {
 
     if (this.isEditMode && this.employeeId) {
       request$ = this.employeeService.updateEmployee({
+        id: this.employeeId,
         body: employeeData
       });
     } else {
