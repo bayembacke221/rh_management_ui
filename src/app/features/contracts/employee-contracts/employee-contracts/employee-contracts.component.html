@@ -1,0 +1,381 @@
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+    <div>
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Contrats</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">Gestion des contrats de l'employé</p>
+    </div>
+    <button
+      (click)="toggleContractForm()"
+      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+      <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      {{ editingContractId ? 'Modifier le contrat' : 'Ajouter un contrat' }}
+    </button>
+  </div>
+
+  <!-- Messages de succès/erreur -->
+  <div *ngIf="successMessage" class="mx-4 mb-4 bg-green-50 border-l-4 border-green-400 p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-green-700">{{ successMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="mx-4 mb-4 bg-red-50 border-l-4 border-red-400 p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700">{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire d'ajout/modification de contrat -->
+  <div *ngIf="showContractForm" class="border-t border-gray-200 px-4 py-5 sm:px-6 bg-gray-50">
+    <form [formGroup]="contractForm" (submit)="saveContract()" class="space-y-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="type" class="block text-sm font-medium text-gray-700">Type de contrat *</label>
+          <select
+            id="type"
+            formControlName="type"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="CDI">CDI</option>
+            <option value="CDD">CDD</option>
+            <option value="STAGE">Stage</option>
+            <option value="INTERIM">Intérim</option>
+            <option value="FREELANCE">Freelance</option>
+            <option value="APPRENTICESHIP">Apprentissage</option>
+            <option value="PART_TIME">Temps partiel</option>
+          </select>
+          <div *ngIf="contractForm.get('type')?.invalid && contractForm.get('type')?.touched" class="mt-1 text-sm text-red-600">
+            Le type de contrat est requis
+          </div>
+        </div>
+
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700">Statut *</label>
+          <select
+            id="status"
+            formControlName="status"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="DRAFT">Brouillon</option>
+            <option value="PENDING">En attente</option>
+            <option value="ACTIVE">Actif</option>
+          </select>
+          <div *ngIf="contractForm.get('status')?.invalid && contractForm.get('status')?.touched" class="mt-1 text-sm text-red-600">
+            Le statut du contrat est requis
+          </div>
+        </div>
+
+        <div>
+          <label for="startDate" class="block text-sm font-medium text-gray-700">Date de début *</label>
+          <input
+            type="date"
+            id="startDate"
+            formControlName="startDate"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <div *ngIf="contractForm.get('startDate')?.invalid && contractForm.get('startDate')?.touched" class="mt-1 text-sm text-red-600">
+            La date de début est requise
+          </div>
+        </div>
+
+        <div>
+          <label for="endDate" class="block text-sm font-medium text-gray-700">Date de fin</label>
+          <input
+            type="date"
+            id="endDate"
+            formControlName="endDate"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <small class="mt-1 text-sm text-gray-500">Obligatoire pour les CDD et stages</small>
+        </div>
+
+        <div>
+          <label for="salary" class="block text-sm font-medium text-gray-700">Salaire brut (€) *</label>
+          <input
+            type="number"
+            id="salary"
+            formControlName="salary"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <div *ngIf="contractForm.get('salary')?.invalid && contractForm.get('salary')?.touched" class="mt-1 text-sm text-red-600">
+            <span *ngIf="contractForm.get('salary')?.errors?.['required']">Le salaire est requis</span>
+            <span *ngIf="contractForm.get('salary')?.errors?.['min']">Le salaire doit être positif</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="workHoursPerWeek" class="block text-sm font-medium text-gray-700">Heures de travail hebdomadaires *</label>
+          <input
+            type="number"
+            id="workHoursPerWeek"
+            formControlName="workHoursPerWeek"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <div *ngIf="contractForm.get('workHoursPerWeek')?.invalid && contractForm.get('workHoursPerWeek')?.touched" class="mt-1 text-sm text-red-600">
+            <span *ngIf="contractForm.get('workHoursPerWeek')?.errors?.['required']">Les heures de travail sont requises</span>
+            <span *ngIf="contractForm.get('workHoursPerWeek')?.errors?.['min']">Les heures doivent être positives</span>
+            <span *ngIf="contractForm.get('workHoursPerWeek')?.errors?.['max']">Les heures ne peuvent pas dépasser 50</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-4">
+        <button
+          type="button"
+          (click)="toggleContractForm()"
+          class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+          Annuler
+        </button>
+        <button
+          type="submit"
+          [disabled]="processingAction"
+          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          [ngClass]="{'opacity-70 cursor-not-allowed': processingAction}">
+          <svg *ngIf="processingAction" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ editingContractId ? 'Mettre à jour' : 'Créer le contrat' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Upload de document -->
+  <div *ngIf="activeContractId" class="border-t border-gray-200 px-4 py-5 sm:px-6 bg-gray-50">
+    <h4 class="text-base font-medium text-gray-900">Ajouter un document au contrat</h4>
+    <form (submit)="uploadContractDocument(); $event.preventDefault()" class="mt-3 space-y-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="docType" class="block text-sm font-medium text-gray-700">Type de document *</label>
+          <select
+            id="docType"
+            [(ngModel)]="documentType"
+            name="docType"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="CONTRACT">Contrat</option>
+            <option value="CERTIFICATE">Certificat</option>
+            <option value="ADMINISTRATIVE">Document administratif</option>
+            <option value="OTHER">Autre</option>
+          </select>
+        </div>
+        <div>
+          <label for="docName" class="block text-sm font-medium text-gray-700">Nom du document</label>
+          <input
+            type="text"
+            id="docName"
+            [(ngModel)]="documentName"
+            name="docName"
+            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Fichier *</label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+          <div class="space-y-1 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="flex text-sm text-gray-600">
+              <label for="docFile" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                <span>Upload a file</span>
+                <input
+                  id="docFile"
+                  name="docFile"
+                  type="file"
+                  class="sr-only"
+                  (change)="onFileChange($event)">
+              </label>
+              <p class="pl-1">or drag and drop</p>
+            </div>
+            <p class="text-xs text-gray-500">
+              PDF, DOCX, XLS, JPG, PNG up to 10MB
+            </p>
+            <p *ngIf="selectedFile" class="text-sm text-blue-600">
+              {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(0) }} KB)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3">
+        <button
+          type="button"
+          (click)="activeContractId = null"
+          class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+          Annuler
+        </button>
+        <button
+          type="submit"
+          [disabled]="!selectedFile || uploadingDocument"
+          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          [ngClass]="{'opacity-70 cursor-not-allowed': !selectedFile || uploadingDocument}">
+          <svg *ngIf="uploadingDocument" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Upload
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Liste des contrats -->
+  <div class="border-t border-gray-200">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="px-4 py-8 text-center text-gray-500">
+      <svg class="animate-spin mx-auto h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-2">Chargement des contrats...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && !error && contracts.length === 0" class="px-4 py-8 text-center text-gray-500">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <p class="mt-2">Aucun contrat disponible</p>
+      <p class="mt-1 text-sm">Cliquez sur "Ajouter un contrat" pour commencer</p>
+    </div>
+
+    <!-- List of contracts -->
+    <div *ngIf="!loading && !error && contracts.length > 0" class="divide-y divide-gray-200">
+      <div *ngFor="let contract of contracts" class="px-4 py-4 sm:px-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="text-lg font-medium text-gray-900">{{ getContractTypeName(contract.type!) }}</h4>
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="getContractStatusClass(contract.status!)">
+              {{ getContractStatusName(contract.status!) }}
+            </span>
+          </div>
+          <div class="flex space-x-2">
+            <button
+              (click)="editContract(contract)"
+              class="text-blue-600 hover:text-blue-900">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 0L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button
+              (click)="generateContractDocument(contract.id!)"
+              title="Générer document"
+              class="text-green-600 hover:text-green-900">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+            <button
+              (click)="deleteContract(contract.id!)"
+              title="Supprimer"
+              class="text-red-600 hover:text-red-900">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="mt-2 sm:flex sm:justify-between">
+          <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+            <div class="mr-6">
+              <span class="font-medium text-gray-700">Période:</span>
+              <span class="ml-1">{{ formatDate(contract.startDate) }} - {{ contract.endDate ? formatDate(contract.endDate) : 'Indéterminé' }}</span>
+            </div>
+            <div class="mr-6">
+              <span class="font-medium text-gray-700">Salaire:</span>
+              <span class="ml-1">{{ contract.salary }} €</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-700">Heures:</span>
+              <span class="ml-1">{{ contract.workHoursPerWeek }} h/semaine</span>
+            </div>
+          </div>
+          <div class="mt-2 flex flex-shrink-0 sm:mt-0">
+            <div *ngIf="contract.status === 'DRAFT'" class="flex space-x-2">
+              <button
+                (click)="updateContractStatus(contract.id!, 'PENDING')"
+                class="inline-flex items-center px-2.5 py-0.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
+                Soumettre
+              </button>
+            </div>
+            <div *ngIf="contract.status === 'PENDING'" class="flex space-x-2">
+              <button
+                (click)="updateContractStatus(contract.id!, 'ACTIVE')"
+                class="inline-flex items-center px-2.5 py-0.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700">
+                Activer
+              </button>
+              <button
+                (click)="updateContractStatus(contract.id!, 'DRAFT')"
+                class="inline-flex items-center px-2.5 py-0.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
+                Retour en brouillon
+              </button>
+            </div>
+            <div *ngIf="contract.status === 'ACTIVE'" class="flex space-x-2">
+              <button
+                (click)="updateContractStatus(contract.id!, 'TERMINATED', 'Résiliation')"
+                class="inline-flex items-center px-2.5 py-0.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700">
+                Résilier
+              </button>
+            </div>
+            <button
+              (click)="showUploadDocumentForm(contract.id!)"
+              class="ml-3 inline-flex items-center px-2.5 py-0.5 border border-blue-300 shadow-sm text-xs font-medium rounded text-blue-700 bg-white hover:bg-blue-50">
+              Ajouter document
+            </button>
+          </div>
+        </div>
+
+        <!-- Documents associés au contrat -->
+        <div *ngIf="contractDocuments[contract.id!].length > 0" class="mt-4">
+          <h5 class="text-sm font-medium text-gray-700 mb-2">Documents associés</h5>
+          <div class="bg-gray-50 overflow-hidden shadow-sm rounded-md">
+            <ul role="list" class="divide-y divide-gray-200">
+              <li *ngFor="let doc of contractDocuments[contract.id!]" class="px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center">
+                  <svg class="h-5 w-5 text-gray-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">{{ doc.name }}</div>
+                    <div class="text-xs text-gray-500 flex">
+                      <span class="mr-3">{{ getDocumentTypeName(doc.type!) }}</span>
+                      <span>{{ formatDate(doc.uploadDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    (click)="downloadContractDocument(doc.id!)"
+                    class="text-blue-600 hover:text-blue-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </button>
+                  <button
+                    (click)="deleteContractDocument(doc.id!)"
+                    class="text-red-600 hover:text-red-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

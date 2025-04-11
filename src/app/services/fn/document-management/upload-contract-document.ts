@@ -11,28 +11,12 @@ import { RequestBuilder } from '../../request-builder';
 import { DocumentDto } from '../../models/document-dto';
 
 export interface UploadContractDocument$Params {
-
-/**
- * ID du contrat
- */
   contractId: number;
-
-/**
- * Type de document
- */
   type: 'CV' | 'IDENTITY' | 'DIPLOMA' | 'CONTRACT' | 'PAYSLIP' | 'CERTIFICATE' | 'ADMINISTRATIVE' | 'OTHER';
-
-/**
- * Nom du document (optionnel)
- */
   name?: string;
-      body?: {
-
-/**
- * Fichier à uploader
- */
-'file': Blob;
-}
+  body?: {
+    file: Blob;
+  } | FormData;
 }
 
 export function uploadContractDocument(http: HttpClient, rootUrl: string, params: UploadContractDocument$Params, context?: HttpContext): Observable<StrictHttpResponse<DocumentDto>> {
@@ -40,10 +24,52 @@ export function uploadContractDocument(http: HttpClient, rootUrl: string, params
   if (params) {
     rb.path('contractId', params.contractId, {});
     rb.query('type', params.type, {});
-    rb.query('name', params.name, {});
-    rb.body(params.body, 'application/json');
+    if (params.name) {
+      rb.query('name', params.name, {});
+    }
+
+    const formData = new FormData();
+
+    if (params.body instanceof FormData) {
+      return http.post<DocumentDto>(
+        `${rootUrl}${uploadContractDocument.PATH.replace('{contractId}', params.contractId.toString())}`,
+        params.body,
+        {
+          params: {
+            type: params.type,
+            ...(params.name ? { name: params.name } : {})
+          },
+          observe: 'response',
+          responseType: 'json',
+          context
+        }
+      ).pipe(
+        filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
+        map((r: HttpResponse<any>) => r as StrictHttpResponse<DocumentDto>)
+      );
+    } else if (params.body && 'file' in params.body) {
+      formData.append('file', params.body.file);
+
+      return http.post<DocumentDto>(
+        `${rootUrl}${uploadContractDocument.PATH.replace('{contractId}', params.contractId.toString())}`,
+        formData,
+        {
+          params: {
+            type: params.type,
+            ...(params.name ? { name: params.name } : {})
+          },
+          observe: 'response',
+          responseType: 'json',
+          context
+        }
+      ).pipe(
+        filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
+        map((r: HttpResponse<any>) => r as StrictHttpResponse<DocumentDto>)
+      );
+    }
   }
 
+  // Fallback to original implementation
   return http.request(
     rb.build({ responseType: 'json', accept: 'application/json', context })
   ).pipe(

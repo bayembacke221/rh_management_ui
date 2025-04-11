@@ -30,6 +30,16 @@ export const EMPLOYEE_ROUTES: Routes = [
   {
     path: 'org-chart',
     loadComponent: () => import('./org-chart/org-chart.component').then(m => m.OrgChartComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'contracts/:id',
+        loadChildren: () => import('../contracts/contracts.routes').then(m => m.CONTRACT_ROUTES),
+      },
+      {
+        path: 'documents/:id',
+        loadChildren: () => import('../documents/documents.routes').then(m => m.DOCUMENT_ROUTES),
+      }
+    ]
   }
 ];
