@@ -1,0 +1,181 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        {{ isEditMode ? 'Modifier la demande de congé' : 'Nouvelle demande de congé' }}
+      </h2>
+    </div>
+    <div class="mt-4 flex md:mt-0 md:ml-4">
+      <a routerLink="/leaves" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Retour à la liste
+      </a>
+    </div>
+  </div>
+
+  <!-- States -->
+  <div *ngIf="loading" class="mt-6 flex justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <div *ngIf="error" class="mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="successMessage" class="mt-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ successMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="!loading" class="mt-6 bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+    <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()">
+      <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Informations générales</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Informations de base sur la demande de congé.
+          </p>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-2">
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6 sm:col-span-3">
+              <label for="employeeId" class="block text-sm font-medium text-gray-700">Employé *</label>
+              <select
+                id="employeeId"
+                formControlName="employeeId"
+                [disabled]="isEditMode"
+                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option [value]="''">Sélectionnez un employé</option>
+                <option *ngFor="let employee of employees" [value]="employee.id">
+                  {{ employee.firstName }} {{ employee.lastName }}
+                </option>
+              </select>
+              <div *ngIf="leaveForm.get('employeeId')?.invalid && leaveForm.get('employeeId')?.touched" class="mt-2 text-sm text-red-600">
+                L'employé est requis
+              </div>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <label for="leaveType" class="block text-sm font-medium text-gray-700">Type de congé *</label>
+              <select
+                id="leaveType"
+                formControlName="leaveType"
+                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option *ngFor="let type of leaveTypes" [value]="type.value">
+                  {{ type.label }} <span *ngIf="employeeId && type.value === 'ANNUAL_LEAVE'"> - Solde: {{ getLeaveBalance(type.value) }} jours</span>
+                </option>
+              </select>
+              <div *ngIf="leaveForm.get('leaveType')?.invalid && leaveForm.get('leaveType')?.touched" class="mt-2 text-sm text-red-600">
+                Le type de congé est requis
+              </div>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <label for="startDate" class="block text-sm font-medium text-gray-700">Date de début *</label>
+              <input
+                type="date"
+                id="startDate"
+                formControlName="startDate"
+                class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+              <div *ngIf="leaveForm.get('startDate')?.invalid && leaveForm.get('startDate')?.touched" class="mt-2 text-sm text-red-600">
+                <span *ngIf="leaveForm.get('startDate')?.errors?.['required']">La date de début est requise</span>
+                <span *ngIf="leaveForm.get('startDate')?.errors?.['overlapping']">Cette période chevauche une autre demande de congé</span>
+              </div>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <label for="endDate" class="block text-sm font-medium text-gray-700">Date de fin *</label>
+              <input
+                type="date"
+                id="endDate"
+                formControlName="endDate"
+                class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+              <div *ngIf="leaveForm.get('endDate')?.invalid && leaveForm.get('endDate')?.touched" class="mt-2 text-sm text-red-600">
+                <span *ngIf="leaveForm.get('endDate')?.errors?.['required']">La date de fin est requise</span>
+                <span *ngIf="leaveForm.get('endDate')?.errors?.['invalidEndDate']">La date de fin doit être après la date de début</span>
+                <span *ngIf="leaveForm.get('endDate')?.errors?.['overlapping']">Cette période chevauche une autre demande de congé</span>
+              </div>
+            </div>
+
+            <div class="col-span-6">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input
+                    id="halfDay"
+                    type="checkbox"
+                    formControlName="halfDay"
+                    class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="halfDay" class="font-medium text-gray-700">Demi-journée</label>
+                  <p class="text-gray-500">Cochez cette case si vous demandez une demi-journée de congé.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-6">
+              <label for="reason" class="block text-sm font-medium text-gray-700">Motif</label>
+              <textarea
+                id="reason"
+                formControlName="reason"
+                rows="3"
+                class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
+                placeholder="Motif de votre demande de congé"></textarea>
+            </div>
+
+            <div class="col-span-6">
+              <label for="attachments" class="block text-sm font-medium text-gray-700">Pièces jointes</label>
+              <div class="mt-1 flex items-center">
+                <input
+                  id="attachments"
+                  type="file"
+                  class="sr-only">
+                <label for="attachments" class="relative cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                  <span>Télécharger un fichier</span>
+                </label>
+                <p class="ml-3 text-xs text-gray-500">PNG, JPG, PDF jusqu'à 10MB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-5">
+        <div class="flex justify-end">
+          <a routerLink="/leaves" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Annuler
+          </a>
+          <button
+            type="submit"
+            [disabled]="submitting || leaveForm.invalid"
+            class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            [class.opacity-70]="submitting || leaveForm.invalid"
+            [class.cursor-not-allowed]="submitting || leaveForm.invalid">
+            <svg *ngIf="submitting" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isEditMode ? 'Mettre à jour' : 'Soumettre' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
