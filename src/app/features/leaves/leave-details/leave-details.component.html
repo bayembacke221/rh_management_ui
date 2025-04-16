@@ -1,0 +1,138 @@
+<!-- src/app/features/leaves/leave-details/leave-details.component.html -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        Détails de la demande de congé
+      </h2>
+    </div>
+    <div class="mt-4 flex md:mt-0 md:ml-4">
+      <a routerLink="/leaves" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Retour à la liste
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="mt-6 flex justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave details -->
+  <div *ngIf="!loading && !error && leave" class="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <div>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Demande de congé n°{{ leave.id }}
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          Détails de la demande de congé
+        </p>
+      </div>
+      <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium" [ngClass]="getStatusClass(leave.status)">
+        {{ getStatusName(leave.status) }}
+      </span>
+    </div>
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Employé</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ leave.employee?.firstName }} {{ leave.employee?.lastName }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Type de congé</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ getLeaveTypeName(leave.leaveType) }}
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Période</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            Du {{ formatDate(leave.startDate) }} au {{ formatDate(leave.endDate) }}
+            <span *ngIf="leave.halfDay">(demi-journée)</span>
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Durée</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ leave.durationDays }} jour(s)
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Motif</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ leave.reason || 'Aucun motif spécifié' }}
+          </dd>
+        </div>
+        <div *ngIf="leave.status === 'REJECTED'" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Motif du refus</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ leave.rejectionReason || 'Aucun motif spécifié' }}
+          </dd>
+        </div>
+        <div *ngIf="leave.status === 'APPROVED'" class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Approuvé par</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ leave.approvedBy?.firstName }} {{ leave.approvedBy?.lastName }}
+            <span *ngIf="leave.approvalDate" class="text-gray-500 ml-2">({{ formatDate(leave.approvalDate) }})</span>
+          </dd>
+        </div>
+        <div *ngIf="leave.attachments" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Pièces jointes</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <ul role="list" class="border border-gray-200 rounded-md divide-y divide-gray-200">
+              <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                <div class="w-0 flex-1 flex items-center">
+                  <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="ml-2 flex-1 w-0 truncate">
+                    {{ leave.attachments }}
+                  </span>
+                </div>
+                <div class="ml-4 flex-shrink-0">
+                  <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
+                    Télécharger
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </dd>
+        </div>
+      </dl>
+    </div>
+    <!-- Actions -->
+    <div *ngIf="leave.status === 'PENDING'" class="border-t border-gray-200 px-4 py-5 sm:p-6 flex justify-end space-x-3">
+      <button (click)="rejectLeave()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+        Refuser
+      </button>
+      <button (click)="approveLeave()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+        Approuver
+      </button>
+      <button (click)="cancelLeave()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+        Annuler
+      </button>
+    </div>
+    <div *ngIf="leave.status === 'APPROVED'" class="border-t border-gray-200 px-4 py-5 sm:p-6 flex justify-end">
+      <button (click)="cancelLeave()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+        Annuler le congé
+      </button>
+    </div>
+  </div>
+</div>
