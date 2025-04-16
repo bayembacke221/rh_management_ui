@@ -1,0 +1,245 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">Demandes de congés</h1>
+      <p class="mt-2 text-sm text-gray-700">Liste complète des demandes de congés</p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <a routerLink="/leaves/create" class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto">
+        Nouvelle demande
+      </a>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="mt-6 bg-white shadow rounded-lg p-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+      <div>
+        <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
+        <div class="mt-1">
+          <select [(ngModel)]="selectedStatus" id="status" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+            <option value="">Tous les statuts</option>
+            <option *ngFor="let status of leaveStatuses" [value]="status">{{getStatusName(status)}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="type" class="block text-sm font-medium text-gray-700">Type de congé</label>
+        <div class="mt-1">
+          <select [(ngModel)]="selectedType" id="type" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+            <option value="">Tous les types</option>
+            <option *ngFor="let type of leaveTypes" [value]="type">{{getLeaveTypeName(type)}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Période</label>
+        <div class="mt-1 grid grid-cols-2 gap-2">
+          <div>
+            <label for="dateRangeStart" class="sr-only">Date début</label>
+            <input
+              id="dateRangeStart"
+              type="date"
+              [(ngModel)]="dateRange.start"
+              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              placeholder="Date début">
+          </div>
+          <div>
+            <label for="dateRangeEnd" class="sr-only">Date fin</label>
+            <input
+              id="dateRangeEnd"
+              type="date"
+              [(ngModel)]="dateRange.end"
+              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              placeholder="Date fin">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-end space-x-2">
+        <button (click)="applyFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+          </svg>
+          Filtrer
+        </button>
+        <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="mt-8 flex justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="mt-8 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading && !error && leaves.length > 0" class="mt-8 flex flex-col">
+    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                Employé
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Type
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Période
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Durée
+              </th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                Statut
+              </th>
+              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span class="sr-only">Actions</span>
+              </th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+            <tr *ngFor="let leave of leaves">
+              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                <div class="flex items-center">
+                  <div class="h-10 w-10 flex-shrink-0">
+                    <img class="h-10 w-10 rounded-full"
+                         src="https://ui-avatars.com/api/?name={{leave.employee?.firstName}}+{{leave.employee?.lastName}}&background=0D8ABC&color=fff"
+                         alt="">
+                  </div>
+                  <div class="ml-4">
+                    <div class="font-medium text-gray-900">{{leave.employee?.firstName}} {{leave.employee?.lastName}}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                {{getLeaveTypeName(leave.leaveType!)}}
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                {{formatDate(leave.startDate)}} - {{formatDate(leave.endDate)}}
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                {{leave.durationDays}} jour(s)
+              </td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+                      [ngClass]="getStatusClass(leave.status!)">
+                  {{getStatusName(leave.status!)}}
+                </span>
+              </td>
+              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                <button *ngIf="leave.status === 'PENDING'" (click)="approveLeave(leave.id!)" class="text-green-600 hover:text-green-900 mr-3">Approuver</button>
+                <button *ngIf="leave.status === 'PENDING'" (click)="rejectLeave(leave.id!)" class="text-red-600 hover:text-red-900 mr-3">Refuser</button>
+                <button *ngIf="leave.status === 'PENDING'" (click)="cancelLeave(leave.id!)" class="text-gray-600 hover:text-gray-900">Annuler</button>
+                <a [routerLink]="['/leaves/view', leave.id]" class="text-blue-600 hover:text-blue-900 ml-3">Détails</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !error && leaves.length === 0" class="mt-8 text-center py-12 bg-white rounded-lg shadow">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune demande de congé trouvée</h3>
+    <p class="mt-1 text-sm text-gray-500">
+      Aucune demande de congé ne correspond à vos critères de recherche.
+    </p>
+    <div class="mt-6">
+      <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && !error && totalItems > 0" class="mt-5 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+    <div class="flex flex-1 justify-between sm:hidden">
+      <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
+              class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              [class.opacity-50]="currentPage === 0"
+              [class.cursor-not-allowed]="currentPage === 0">
+        Précédent
+      </button>
+      <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
+              class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              [class.opacity-50]="currentPage === totalPages - 1"
+              [class.cursor-not-allowed]="currentPage === totalPages - 1">
+        Suivant
+      </button>
+    </div>
+    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700">
+          Affichage de <span class="font-medium">{{ currentPage * pageSize + 1 }}</span> à
+          <span class="font-medium">{{ Math.min((currentPage + 1) * pageSize, totalItems) }}</span> sur
+          <span class="font-medium">{{ totalItems }}</span> résultats
+        </p>
+      </div>
+      <div>
+        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+          <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
+                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                  [class.opacity-50]="currentPage === 0"
+                  [class.cursor-not-allowed]="currentPage === 0">
+            <span class="sr-only">Précédent</span>
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+            </svg>
+          </button>
+
+          <!-- Page numbers -->
+          <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+            <button (click)="changePage(i)"
+                    class="relative inline-flex items-center border border-gray-300 px-4 py-2 text-sm font-medium focus:z-20"
+                    [class.z-10]="currentPage === i"
+                    [class.bg-blue-50]="currentPage === i"
+                    [class.border-blue-500]="currentPage === i"
+                    [class.text-blue-600]="currentPage === i"
+                    [class.bg-white]="currentPage !== i"
+                    [class.text-gray-500]="currentPage !== i"
+                    [class.hover:bg-gray-50]="currentPage !== i">
+              {{ i + 1 }}
+            </button>
+          </ng-container>
+
+          <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
+                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                  [class.opacity-50]="currentPage === totalPages - 1"
+                  [class.cursor-not-allowed]="currentPage === totalPages - 1">
+            <span class="sr-only">Suivant</span>
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
