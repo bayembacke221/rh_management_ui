@@ -1,0 +1,116 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        Calendrier des congés
+      </h2>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">Vue calendaire des congés de l'équipe</p>
+    </div>
+    <div class="mt-4 flex md:mt-0 md:ml-4">
+      <a routerLink="/leaves" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Liste des demandes
+      </a>
+      <a routerLink="/leaves/create" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Nouvelle demande
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="mt-6 flex justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p>{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar navigation -->
+  <div *ngIf="!loading" class="mt-6 flex items-center justify-between">
+    <button (click)="previousMonth()" type="button" class="inline-flex items-center p-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <h3 class="text-lg font-medium text-gray-900">{{ months[currentMonth] }} {{ currentYear }}</h3>
+    <button (click)="nextMonth()" type="button" class="inline-flex items-center p-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Calendar -->
+  <div *ngIf="!loading" class="mt-4 bg-white shadow ring-1 ring-black ring-opacity-5 lg:rounded-lg overflow-hidden">
+    <div class="grid grid-cols-7 gap-px border-b border-gray-200 bg-gray-200 text-center text-xs font-semibold leading-6 text-gray-700">
+      <div class="bg-white py-2">Lun</div>
+      <div class="bg-white py-2">Mar</div>
+      <div class="bg-white py-2">Mer</div>
+      <div class="bg-white py-2">Jeu</div>
+      <div class="bg-white py-2">Ven</div>
+      <div class="bg-white py-2">Sam</div>
+      <div class="bg-white py-2">Dim</div>
+    </div>
+    <div class="grid grid-cols-7 gap-px bg-gray-200">
+      <ng-container *ngFor="let day of calendarDays">
+        <div
+          class="bg-white min-h-[100px] text-right p-2"
+          [class.bg-blue-50]="day.isToday"
+          [class.bg-gray-50]="day.isWeekend"
+        >
+          <span *ngIf="day.day" class="font-semibold text-sm" [class.text-blue-600]="day.isToday">{{ day.day }}</span>
+
+          <!-- Events for this day -->
+          <div *ngIf="day.day && calendarEvents[day.day]" class="mt-2 space-y-1 text-left">
+            <div
+              *ngFor="let event of calendarEvents[day.day]"
+              class="px-2 py-1 text-xs rounded truncate cursor-pointer"
+              [routerLink]="['/leaves/view', event.id]"
+              [ngClass]="getLeaveTypeColor(event.type)"
+            >
+              {{ event.employee?.firstName }} {{ event.employee?.lastName }} ({{ getShortLeaveType(event.type) }})
+              <span *ngIf="event.halfDay">½</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div *ngIf="!loading" class="mt-6 bg-white p-4 shadow sm:rounded-lg">
+    <h4 class="text-sm font-medium text-gray-500">Légende</h4>
+    <div class="grid grid-cols-2 gap-4 mt-2 sm:grid-cols-5">
+      <div class="flex items-center">
+        <span class="inline-block w-3 h-3 mr-2 bg-blue-100 border border-blue-400 rounded-sm"></span>
+        <span class="text-xs">Congés payés</span>
+      </div>
+      <div class="flex items-center">
+        <span class="inline-block w-3 h-3 mr-2 bg-red-100 border border-red-400 rounded-sm"></span>
+        <span class="text-xs">Maladie</span>
+      </div>
+      <div class="flex items-center">
+        <span class="inline-block w-3 h-3 mr-2 bg-yellow-100 border border-yellow-400 rounded-sm"></span>
+        <span class="text-xs">Sans solde</span>
+      </div>
+      <div class="flex items-center">
+        <span class="inline-block w-3 h-3 mr-2 bg-green-100 border border-green-400 rounded-sm"></span>
+        <span class="text-xs">Formation</span>
+      </div>
+      <div class="flex items-center">
+        <span class="inline-block w-3 h-3 mr-2 bg-gray-100 border border-gray-400 rounded-sm"></span>
+        <span class="text-xs">Autres congés</span>
+      </div>
+    </div>
+  </div>
+</div>
