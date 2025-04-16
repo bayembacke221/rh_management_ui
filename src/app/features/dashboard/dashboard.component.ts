@@ -8,6 +8,7 @@ import { PositionsService } from '../../services/services/positions.service';
 import { ContratsService } from '../../services/services/contrats.service';
 import {ContractDto} from '../../services/models/contract-dto';
 import {EmployeeDto} from '../../services/models/employee-dto';
+import { PendingLeavesWidgetComponent } from './widgets/pending-leaves-widget.component';
 
 interface StatCard {
   title: string;
@@ -21,7 +22,7 @@ interface StatCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PendingLeavesWidgetComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
