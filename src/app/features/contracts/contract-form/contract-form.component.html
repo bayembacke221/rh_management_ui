@@ -1,0 +1,225 @@
+<!-- src/app/features/contracts/contract-form/contract-form.component.html -->
+<div class="py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <h1 class="text-2xl font-semibold text-gray-900">{{ editMode ? 'Modifier le contrat' : 'Nouveau contrat' }}</h1>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-6">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="py-10 text-center">
+      <svg class="animate-spin h-10 w-10 mx-auto text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-3 text-lg text-gray-600">Chargement...</p>
+    </div>
+
+    <!-- Success message -->
+    <div *ngIf="successMessage" class="mb-6 rounded-md bg-green-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-green-800">
+            {{ successMessage }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="error" class="mb-6 rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-red-800">
+            {{ error }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="!loading" class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <form [formGroup]="contractForm" (submit)="onSubmit()" class="divide-y divide-gray-200">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <!-- Employé -->
+            <div class="sm:col-span-3">
+              <label for="employeeId" class="block text-sm font-medium text-gray-700">
+                Employé *
+              </label>
+              <div class="mt-1">
+                <select
+                  id="employeeId"
+                  formControlName="employeeId"
+                  [attr.disabled]="editMode ? true : null"
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  [ngClass]="{'opacity-60': editMode}"
+                >
+                  <option [ngValue]="null">Sélectionner un employé</option>
+                  <option *ngFor="let employee of employees" [ngValue]="employee.id">
+                    {{ employee.firstName }} {{ employee.lastName }}
+                  </option>
+                </select>
+                <div *ngIf="contractForm.get('employeeId')?.invalid && contractForm.get('employeeId')?.touched" class="mt-1 text-sm text-red-600">
+                  L'employé est requis
+                </div>
+              </div>
+            </div>
+
+            <!-- Type de contrat -->
+            <div class="sm:col-span-3">
+              <label for="type" class="block text-sm font-medium text-gray-700">
+                Type de contrat *
+              </label>
+              <div class="mt-1">
+                <select
+                  id="type"
+                  formControlName="type"
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                >
+                  <option value="CDI">CDI</option>
+                  <option value="CDD">CDD</option>
+                  <option value="STAGE">Stage</option>
+                  <option value="INTERIM">Intérim</option>
+                  <option value="FREELANCE">Freelance</option>
+                  <option value="APPRENTICESHIP">Apprentissage</option>
+                  <option value="PART_TIME">Temps partiel</option>
+                </select>
+                <div *ngIf="contractForm.get('type')?.invalid && contractForm.get('type')?.touched" class="mt-1 text-sm text-red-600">
+                  Le type de contrat est requis
+                </div>
+              </div>
+            </div>
+
+            <!-- Date de début -->
+            <div class="sm:col-span-3">
+              <label for="startDate" class="block text-sm font-medium text-gray-700">
+                Date de début *
+              </label>
+              <div class="mt-1">
+                <input
+                  type="date"
+                  id="startDate"
+                  formControlName="startDate"
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                >
+                <div *ngIf="contractForm.get('startDate')?.invalid && contractForm.get('startDate')?.touched" class="mt-1 text-sm text-red-600">
+                  La date de début est requise
+                </div>
+              </div>
+            </div>
+
+            <!-- Date de fin -->
+            <div class="sm:col-span-3">
+              <label for="endDate" class="block text-sm font-medium text-gray-700">
+                Date de fin
+              </label>
+              <div class="mt-1">
+                <input
+                  type="date"
+                  id="endDate"
+                  formControlName="endDate"
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                >
+                <div class="mt-1 text-xs text-gray-500">
+                  Obligatoire pour les CDD, stages et contrats temporaires
+                </div>
+              </div>
+            </div>
+
+            <!-- Salaire -->
+            <div class="sm:col-span-3">
+              <label for="salary" class="block text-sm font-medium text-gray-700">
+                Salaire brut annuel (€) *
+              </label>
+              <div class="mt-1">
+                <input
+                  type="number"
+                  id="salary"
+                  formControlName="salary"
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                >
+                <div *ngIf="contractForm.get('salary')?.invalid && contractForm.get('salary')?.touched" class="mt-1 text-sm text-red-600">
+                  <span *ngIf="contractForm.get('salary')?.errors?.['required']">Le salaire est requis</span>
+                  <span *ngIf="contractForm.get('salary')?.errors?.['min']">Le salaire doit être positif</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Heures hebdomadaires -->
+            <div class="sm:col-span-3">
+              <label for="workHoursPerWeek" class="block text-sm font-medium text-gray-700">
+                Heures de travail hebdomadaires *
+              </label>
+              <div class="mt-1">
+                <input
+                  type="number"
+                  id="workHoursPerWeek"
+                  formControlName="workHoursPerWeek"
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                >
+                <div *ngIf="contractForm.get('workHoursPerWeek')?.invalid && contractForm.get('workHoursPerWeek')?.touched" class="mt-1 text-sm text-red-600">
+                  <span *ngIf="contractForm.get('workHoursPerWeek')?.errors?.['required']">Les heures de travail sont requises</span>
+                  <span *ngIf="contractForm.get('workHoursPerWeek')?.errors?.['min']">Les heures doivent être positives</span>
+                  <span *ngIf="contractForm.get('workHoursPerWeek')?.errors?.['max']">Les heures ne peuvent pas dépasser 50</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Statut -->
+            <div *ngIf="!editMode" class="sm:col-span-3">
+              <label for="status" class="block text-sm font-medium text-gray-700">
+                Statut initial *
+              </label>
+              <div class="mt-1">
+                <select
+                  id="status"
+                  formControlName="status"
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                >
+                  <option value="DRAFT">Brouillon</option>
+                  <option value="PENDING">En attente</option>
+                  <option value="ACTIVE">Actif</option>
+                </select>
+                <div *ngIf="contractForm.get('status')?.invalid && contractForm.get('status')?.touched" class="mt-1 text-sm text-red-600">
+                  Le statut est requis
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 flex justify-end space-x-3">
+          <button
+            type="button"
+            routerLink="/contracts"
+            class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            [disabled]="submitting"
+            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <svg *ngIf="submitting" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ editMode ? 'Mettre à jour' : 'Créer le contrat' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

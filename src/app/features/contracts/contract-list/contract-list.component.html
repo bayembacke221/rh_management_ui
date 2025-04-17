@@ -1,0 +1,218 @@
+<div class="py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <h1 class="text-2xl font-semibold text-gray-900">Liste des Contrats</h1>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-6">
+    <!-- Filtres -->
+    <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 mb-6">
+      <div class="md:grid md:grid-cols-4 md:gap-6">
+        <div class="md:col-span-1">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Filtres</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Filtrer la liste des contrats
+          </p>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-3">
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div>
+              <label for="search" class="block text-sm font-medium text-gray-700">Recherche</label>
+              <input
+                type="text"
+                name="search"
+                id="search"
+                [(ngModel)]="searchTerm"
+                class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                placeholder="Nom employé..."
+              />
+            </div>
+            <div>
+              <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
+              <select
+                id="status"
+                name="status"
+                [(ngModel)]="statusFilter"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option [ngValue]="null">Tous</option>
+                <option value="DRAFT">Brouillon</option>
+                <option value="PENDING">En attente</option>
+                <option value="ACTIVE">Actif</option>
+                <option value="EXPIRED">Expiré</option>
+                <option value="TERMINATED">Résilié</option>
+                <option value="RENEWED">Renouvelé</option>
+              </select>
+            </div>
+            <div>
+              <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+              <select
+                id="type"
+                name="type"
+                [(ngModel)]="typeFilter"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option [ngValue]="null">Tous</option>
+                <option value="CDI">CDI</option>
+                <option value="CDD">CDD</option>
+                <option value="STAGE">Stage</option>
+                <option value="INTERIM">Intérim</option>
+                <option value="FREELANCE">Freelance</option>
+                <option value="APPRENTICESHIP">Apprentissage</option>
+                <option value="PART_TIME">Temps partiel</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex justify-end mt-4 space-x-3">
+            <button
+              type="button"
+              (click)="resetFilters()"
+              class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Réinitialiser
+            </button>
+            <button
+              type="button"
+              (click)="applyFilters()"
+              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Appliquer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table des contrats -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Contrats
+        </h3>
+        <a
+          routerLink="/contracts/create"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Nouveau contrat
+        </a>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="loading" class="px-4 py-8 text-center text-gray-500">
+        <svg class="animate-spin mx-auto h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="mt-2">Chargement des contrats...</p>
+      </div>
+
+      <!-- Error state -->
+      <div *ngIf="error" class="px-4 py-5 sm:p-6 bg-red-50 text-red-700 border-l-4 border-red-500">
+        <p>{{ error }}</p>
+        <button (click)="loadContracts()" class="mt-2 text-sm font-medium hover:underline">Réessayer</button>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && !error && contracts.length === 0" class="px-4 py-8 text-center text-gray-500">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="mt-2">Aucun contrat trouvé</p>
+        <p class="mt-1 text-sm">Ajustez vos filtres ou ajoutez un nouveau contrat</p>
+      </div>
+
+      <!-- List of contracts -->
+      <ul *ngIf="!loading && !error && contracts.length > 0" class="divide-y divide-gray-200">
+        <li *ngFor="let contract of contracts">
+          <a [routerLink]="['/contracts', contract.id]" class="block hover:bg-gray-50">
+            <div class="px-4 py-4 sm:px-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-blue-600 truncate">
+                    {{ contract.employee?.firstName }} {{ contract.employee?.lastName }}
+                  </p>
+                  <p class="flex items-center text-sm text-gray-500">
+                    <span>{{ getContractTypeName(contract.type!) }}</span>
+                    <span class="mx-1">•</span>
+                    <span>{{ contract.salary }} €</span>
+                    <span class="mx-1">•</span>
+                    <span>{{ contract.workHoursPerWeek }} h/semaine</span>
+                  </p>
+                </div>
+                <div class="ml-2 flex-shrink-0 flex">
+                  <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="getContractStatusClass(contract.status!)">
+                    {{ getContractStatusName(contract.status!) }}
+                  </p>
+                </div>
+              </div>
+              <div class="mt-2 sm:flex sm:justify-between">
+                <div class="sm:flex">
+                  <p class="flex items-center text-sm text-gray-500">
+                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                    </svg>
+                    {{ formatDate(contract.startDate) }} - {{ contract.endDate ? formatDate(contract.endDate) : 'Indéterminé' }}
+                  </p>
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                  <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                  </svg>
+                  <p>
+                    Dernière modification: {{ formatDate(contract.endDate) || 'N/A' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Pagination -->
+      <nav *ngIf="!loading && !error && totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-gray-700">
+              Affichage de <span class="font-medium">{{ contracts.length > 0 ? currentPage * pageSize + 1 : 0 }}</span> à <span class="font-medium">{{ (currentPage * pageSize) + contracts.length }}</span> sur <span class="font-medium">{{ totalElements }}</span> résultats
+            </p>
+          </div>
+          <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <button
+                [disabled]="currentPage === 0"
+                (click)="changePage(currentPage - 1)"
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === 0}"
+              >
+                <span class="sr-only">Précédent</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </button>
+              <ng-container *ngFor="let page of [].constructor(totalPages > 5 ? 5 : totalPages); let i = index">
+                <button
+                  *ngIf="i < totalPages"
+                  (click)="changePage(i)"
+                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium"
+                  [ngClass]="{'z-10 bg-blue-50 border-blue-500 text-blue-600': currentPage === i, 'text-gray-500 hover:bg-gray-50': currentPage !== i}"
+                >
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                [disabled]="currentPage >= totalPages - 1"
+                (click)="changePage(currentPage + 1)"
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                [ngClass]="{'opacity-50 cursor-not-allowed': currentPage >= totalPages - 1}"
+              >
+                <span class="sr-only">Suivant</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>

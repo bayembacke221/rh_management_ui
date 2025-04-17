@@ -36,6 +36,10 @@ export const routes: Routes = [
       {
         path: 'leaves',
         loadChildren: () => import('./features/leaves/leaves.routes').then(r => r.LEAVES_ROUTES)
+      },
+      {
+        path: 'contracts',
+        loadChildren: () => import('./features/contracts/contracts.routes').then(r => r.CONTRACT_ROUTES)
       }
     ]
   },
