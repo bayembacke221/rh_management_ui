@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, loginGuard } from './core/guards/auth.guard';
+import {REPORTS_ROUTES} from './features/reports/reports.routes';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,10 @@ export const routes: Routes = [
       {
         path: 'contracts',
         loadChildren: () => import('./features/contracts/contracts.routes').then(r => r.CONTRACT_ROUTES)
+      },
+      {
+        path: 'reports',
+        loadChildren: () => import('./features/reports/reports.routes').then(r => r.REPORTS_ROUTES)
       }
     ]
   },
