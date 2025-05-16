@@ -1,0 +1,354 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        Rapport de Distribution des Employés
+      </h2>
+      <p class="mt-1 text-sm text-gray-500">
+        Analyse de la répartition démographique du personnel
+      </p>
+    </div>
+    <div class="mt-4 flex flex-col md:mt-0 md:ml-4">
+      <div class="flex justify-end mb-2">
+        <button (click)="toggleDateMode()" type="button" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <span *ngIf="!useSpecificDate">Utiliser une date spécifique</span>
+          <span *ngIf="useSpecificDate">Utiliser les données actuelles</span>
+        </button>
+      </div>
+      <form [formGroup]="filterForm" class="flex items-center space-x-2">
+        <ng-container *ngIf="useSpecificDate">
+          <div>
+            <label for="referenceDate" class="block text-sm font-medium text-gray-700">Date de référence</label>
+            <input type="date" id="referenceDate" formControlName="referenceDate" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+          </div>
+          <div class="flex items-end mt-1">
+            <button (click)="loadReport()" type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Appliquer
+            </button>
+          </div>
+        </ng-container>
+        <div class="ml-2 mt-6">
+          <button (click)="downloadReport()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            Télécharger
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="mt-6 flex justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700">{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report content -->
+  <div *ngIf="!loading && !error && report" class="mt-8">
+    <!-- Total employees summary -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Effectif Total
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          {{ report.totalEmployees }} employés au total
+        </p>
+      </div>
+    </div>
+
+    <!-- Gender distribution -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Distribution par Genre
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          Répartition des employés par genre
+        </p>
+      </div>
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Graphical representation -->
+          <div class="flex flex-col space-y-6">
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>Hommes</span>
+                <span>{{ report.genderDistribution?.maleCount ! }} ({{ report.genderDistribution?.malePercentage | percent:'1.1-1' }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-4 mt-2">
+                <div class="bg-blue-600 h-4 rounded-full"
+                     [style.width]="(report.genderDistribution?.malePercentage !) * 100 + '%'"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>Femmes</span>
+                <span>{{ report.genderDistribution?.femaleCount ! }} ({{ report.genderDistribution?.femalePercentage | percent:'1.1-1' }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-4 mt-2">
+                <div class="bg-pink-600 h-4 rounded-full"
+                     [style.width]="(report.genderDistribution?.femalePercentage !) * 100 + '%'"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Departmental breakdown -->
+          <div *ngIf="report.genderDistribution?.byDepartment">
+            <h4 class="text-sm font-medium text-gray-900 mb-4">Répartition par département</h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Département
+                  </th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    H/F
+                  </th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    %
+                  </th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <ng-container *ngFor="let dept of (report.genderDistribution!.byDepartment || {}) | keyvalue">
+                  <tr>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900" rowspan="2">
+                      {{ formatDepartmentName(dept.key) }}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      H: {{ dept.value.maleCount ! }}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      {{ dept.value.malePercentage | percent:'1.0-0' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      F: {{ dept.value.femaleCount ! }}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      {{ dept.value.femalePercentage | percent:'1.0-0' }}
+                    </td>
+                  </tr>
+                </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Age distribution -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Distribution par Âge
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          Répartition des employés par tranche d'âge (Âge moyen : {{ report.ageDistribution?.averageAge || 'N/A' }} ans)
+        </p>
+      </div>
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Age brackets -->
+          <div class="space-y-5">
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>Moins de 25 ans</span>
+                <span>{{ report.ageDistribution?.under25Count ! }} ({{ getPercentage(report.ageDistribution?.under25Count !, report.totalEmployees !) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-indigo-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.ageDistribution?.under25Count !, report.totalEmployees !)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>25-34 ans</span>
+                <span>{{ report.ageDistribution?.age25to34Count ! }} ({{ getPercentage(report.ageDistribution?.age25to34Count !, report.totalEmployees !) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-blue-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.ageDistribution?.age25to34Count !, report.totalEmployees !)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>35-44 ans</span>
+                <span>{{ report.ageDistribution?.age35to44Count! }} ({{ getPercentage(report.ageDistribution?.age35to44Count!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-green-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.ageDistribution?.age35to44Count!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>45-54 ans</span>
+                <span>{{ report.ageDistribution?.age45to54Count!}} ({{ getPercentage(report.ageDistribution?.age45to54Count!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-yellow-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.ageDistribution?.age45to54Count!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>55 ans et plus</span>
+                <span>{{ report.ageDistribution?.age55plusCount!}} ({{ getPercentage(report.ageDistribution?.age55plusCount!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-red-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.ageDistribution?.age55plusCount!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Age by department -->
+          <div *ngIf="report.ageDistribution?.averageAgeByDepartment">
+            <h4 class="text-sm font-medium text-gray-900 mb-4">Âge moyen par département</h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Département
+                  </th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Âge moyen
+                  </th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let dept of (report.ageDistribution!.averageAgeByDepartment || {}) | keyvalue">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ formatDepartmentName(dept.key) }}
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                    {{ dept.value }} ans
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seniority distribution -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Distribution par Ancienneté
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          Répartition des employés par ancienneté (Ancienneté moyenne : {{ report.seniorityDistribution!.averageSeniority || 'N/A' }} ans)
+        </p>
+      </div>
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Seniority brackets -->
+          <div class="space-y-5">
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>Moins d'1 an</span>
+                <span>{{ report.seniorityDistribution!.lessThan1YearCount! }} ({{ getPercentage(report.seniorityDistribution!.lessThan1YearCount!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-purple-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.seniorityDistribution!.lessThan1YearCount!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>1-3 ans</span>
+                <span>{{ report.seniorityDistribution!.oneToThreeYearsCount!}} ({{ getPercentage(report.seniorityDistribution!.oneToThreeYearsCount!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-blue-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.seniorityDistribution!.oneToThreeYearsCount!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>3-5 ans</span>
+                <span>{{ report.seniorityDistribution!.threeToFiveYearsCount!}} ({{ getPercentage(report.seniorityDistribution!.threeToFiveYearsCount!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-green-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.seniorityDistribution!.threeToFiveYearsCount!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>5-10 ans</span>
+                <span>{{ report.seniorityDistribution!.fiveToTenYearsCount!}} ({{ getPercentage(report.seniorityDistribution!.fiveToTenYearsCount!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-yellow-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.seniorityDistribution!.fiveToTenYearsCount!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium text-gray-900">
+                <span>10 ans et plus</span>
+                <span>{{ report.seniorityDistribution!.moreThanTenYearsCount! }} ({{ getPercentage(report.seniorityDistribution!.moreThanTenYearsCount!, report.totalEmployees!) }})</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-red-600 h-2.5 rounded-full"
+                     [style.width]="getBarWidth(report.seniorityDistribution!.moreThanTenYearsCount!, report.totalEmployees!)"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Seniority by department -->
+          <div *ngIf="report.seniorityDistribution!.averageSeniorityByDepartment">
+            <h4 class="text-sm font-medium text-gray-900 mb-4">Ancienneté moyenne par département</h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Département
+                  </th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ancienneté moyenne
+                  </th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let dept of (report.seniorityDistribution!.averageSeniorityByDepartment || {}) | keyvalue">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ formatDepartmentName(dept.key) }}
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                    {{ dept.value }} ans
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
