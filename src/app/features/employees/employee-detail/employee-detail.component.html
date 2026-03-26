@@ -1,249 +1,226 @@
-<div class="px-4 sm:px-6 lg:px-8 py-8">
-  <!-- Loading state -->
-  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    <p class="mt-4 text-gray-600">Chargement des informations de l'employé...</p>
-  </div>
+<div class="space-y-6">
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <svg class="animate-spin h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-3 text-sm text-muted-foreground">Chargement...</p>
+    </div>
+  }
 
-  <!-- Error state -->
-  <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+  <!-- Error -->
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3">
+      <div class="flex items-center gap-2">
+        <svg class="h-4 w-4 text-destructive shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
         </svg>
-      </div>
-      <div class="ml-3">
-        <p>{{ error }}</p>
-        <div class="mt-2">
-          <button (click)="loadEmployeeData()" class="text-sm font-medium text-red-600 hover:text-red-500">
-            Réessayer
-          </button>
-        </div>
+        <p class="text-sm text-destructive">{{ error }}</p>
+        <button (click)="loadEmployeeData()" type="button" class="ml-auto text-sm font-medium text-destructive hover:underline">Reessayer</button>
       </div>
     </div>
-  </div>
+  }
 
-  <!-- Content when loaded -->
-  <div *ngIf="!loading && !error && employee">
-    <!-- Header with employee info and actions -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-      <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
-        <div class="flex items-center">
-          <div class="h-16 w-16 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 mr-4">
-            <img
-              class="h-16 w-16 rounded-full"
-              src="https://ui-avatars.com/api/?name={{employee.firstName}}+{{employee.lastName}}&background=0D8ABC&color=fff"
-              alt="Photo de profil">
-          </div>
+  <!-- Content -->
+  @if (!loading && !error && employee) {
+    <!-- Header card -->
+    <div class="rounded-lg border bg-card shadow-sm">
+      <div class="flex items-start justify-between px-6 py-5">
+        <div class="flex items-center gap-4">
+          <img
+            class="h-14 w-14 rounded-full ring-2 ring-border"
+            src="https://ui-avatars.com/api/?name={{employee.firstName}}+{{employee.lastName}}&background=18181b&color=fafafa&size=56"
+            alt="Photo de profil">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">
+            <h1 class="text-xl font-semibold text-card-foreground">
               {{ employee.firstName }} {{ employee.lastName }}
             </h1>
-            <div class="flex items-center mt-1">
-              <p class="text-sm text-gray-500 mr-4">
-                {{ employee.position?.title || 'Aucun poste' }}
-              </p>
-              <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
-                    [ngClass]="getStatusClass(employee.status!)">
+            <div class="flex items-center gap-2 mt-1">
+              <p class="text-sm text-muted-foreground">{{ employee.position?.title || 'Aucun poste' }}</p>
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                [ngClass]="getStatusClass(employee.status!)">
                 {{ employee.status }}
               </span>
             </div>
           </div>
         </div>
-        <div class="flex space-x-3">
-          <a [routerLink]="['/employees/edit', employee.id]" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-              <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+        <div class="flex items-center gap-2">
+          <a [routerLink]="['/employees/edit', employee.id]"
+            class="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
             </svg>
             Modifier
           </a>
-          <a [routerLink]="['/employees']" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            Retour à la liste
+          <a routerLink="/employees/list"
+            class="inline-flex items-center rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            Retour
           </a>
         </div>
       </div>
 
       <!-- Tabs -->
-      <div class="border-b border-gray-200">
-        <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
-          <button (click)="setActiveTab('info')"
-                  class="py-4 px-1 border-b-2 font-medium text-sm"
-                  [class.border-blue-500]="activeTab === 'info'"
-                  [class.text-blue-600]="activeTab === 'info'"
-                  [class.border-transparent]="activeTab !== 'info'"
-                  [class.text-gray-500]="activeTab !== 'info'"
-                  [class.hover:text-gray-700]="activeTab !== 'info'"
-                  [class.hover:border-gray-300]="activeTab !== 'info'">
-            Informations
-          </button>
-          <button (click)="setActiveTab('documents')"
-                  class="py-4 px-1 border-b-2 font-medium text-sm"
-                  [class.border-blue-500]="activeTab === 'documents'"
-                  [class.text-blue-600]="activeTab === 'documents'"
-                  [class.border-transparent]="activeTab !== 'documents'"
-                  [class.text-gray-500]="activeTab !== 'documents'"
-                  [class.hover:text-gray-700]="activeTab !== 'documents'"
-                  [class.hover:border-gray-300]="activeTab !== 'documents'">
-            Documents
-          </button>
-          <button (click)="setActiveTab('contracts')"
-                  class="py-4 px-1 border-b-2 font-medium text-sm"
-                  [class.border-blue-500]="activeTab === 'contracts'"
-                  [class.text-blue-600]="activeTab === 'contracts'"
-                  [class.border-transparent]="activeTab !== 'contracts'"
-                  [class.text-gray-500]="activeTab !== 'contracts'"
-                  [class.hover:text-gray-700]="activeTab !== 'contracts'"
-                  [class.hover:border-gray-300]="activeTab !== 'contracts'">
-            Contrats
-          </button>
-          <button (click)="setActiveTab('leaves')"
-                  class="py-4 px-1 border-b-2 font-medium text-sm"
-                  [class.border-blue-500]="activeTab === 'leaves'"
-                  [class.text-blue-600]="activeTab === 'leaves'"
-                  [class.border-transparent]="activeTab !== 'leaves'"
-                  [class.text-gray-500]="activeTab !== 'leaves'"
-                  [class.hover:text-gray-700]="activeTab !== 'leaves'"
-                  [class.hover:border-gray-300]="activeTab !== 'leaves'">
-            Absences
-          </button>
+      <div class="border-t px-6">
+        <nav class="flex gap-6 -mb-px">
+          @for (tab of tabs; track tab.id) {
+            <button (click)="setActiveTab(tab.id)" type="button"
+              class="py-3 text-sm font-medium border-b-2 transition-colors"
+              [class.border-foreground]="activeTab === tab.id"
+              [class.text-foreground]="activeTab === tab.id"
+              [class.border-transparent]="activeTab !== tab.id"
+              [class.text-muted-foreground]="activeTab !== tab.id"
+              [class.hover:text-foreground]="activeTab !== tab.id">
+              {{ tab.label }}
+            </button>
+          }
         </nav>
       </div>
+    </div>
 
-      <!-- Tab content -->
-      <div *ngIf="activeTab === 'info'" class="px-4 py-5 sm:p-6">
-        <div class="grid grid-cols-1 gap-y-8 sm:grid-cols-2 gap-x-8">
-          <!-- Informations personnelles -->
-          <div>
-            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Informations personnelles</h3>
-            <dl class="grid grid-cols-1 gap-x-4 gap-y-4">
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Nom</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.lastName}}</dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Prénom</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.firstName}}</dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Genre</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{getGenderLabel(employee.gender!)}}</dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Date de naissance</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{formatDate(employee.birthDate)}}</dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Numéro de sécurité sociale</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.socialSecurityNumber || '-'}}</dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Téléphone</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.phone || '-'}}</dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Adresse</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.address || '-'}}</dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Ville</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.city || '-'}}</dd>
-              </div>
-            </dl>
+    <!-- Info tab -->
+    @if (activeTab === 'info') {
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 animate-fade-in">
+        <!-- Personal -->
+        <div class="rounded-lg border bg-card shadow-sm">
+          <div class="px-6 py-4 border-b">
+            <h3 class="text-sm font-semibold text-card-foreground">Informations personnelles</h3>
           </div>
-
-          <!-- Informations professionnelles -->
-          <div>
-            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Informations professionnelles</h3>
-            <dl class="grid grid-cols-1 gap-x-4 gap-y-4">
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Date d'embauche</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{formatDate(employee.hireDate)}}</dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Statut</dt>
-                <dd class="mt-1 text-sm">
-                  <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
-                        [ngClass]="getStatusClass(employee.status!)">
-                    {{ employee.status }}
-                  </span>
-                </dd>
-              </div>
-              <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Date de fin</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{formatDate(employee.endDate)}}</dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Département</dt>
-                <dd class="mt-1 text-sm text-gray-900">
-                  <a *ngIf="employee.departement?.id" [routerLink]="['/departments/view', employee.departement!.id]" class="text-blue-600 hover:text-blue-800">
-                    {{employee.departement?.name}} ({{employee.departement?.code}})
-                  </a>
-                  <span *ngIf="!employee.departement?.id">-</span>
-                </dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Poste</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.position?.title || '-'}}</dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Manager</dt>
-                <dd class="mt-1 text-sm text-gray-900">
-                  <a *ngIf="employee.manager?.id" [routerLink]="['/employees/view', employee.manager!.id]" class="text-blue-600 hover:text-blue-800">
-                    {{employee.manager?.firstName}} {{employee.manager?.lastName}}
-                  </a>
-                  <span *ngIf="!employee.manager?.id">-</span>
-                </dd>
-              </div>
-            </dl>
+          <div class="px-6 py-4 space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Nom</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.lastName}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Prenom</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.firstName}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Genre</span>
+              <span class="text-sm font-medium text-card-foreground">{{getGenderLabel(employee.gender!)}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Date de naissance</span>
+              <span class="text-sm font-medium text-card-foreground">{{formatDate(employee.birthDate)}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">N° securite sociale</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.socialSecurityNumber || '-'}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Telephone</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.phone || '-'}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Adresse</span>
+              <span class="text-sm font-medium text-card-foreground text-right">{{employee.address || '-'}}, {{employee.city || ''}}</span>
+            </div>
           </div>
+        </div>
 
-          <!-- Informations d'urgence -->
-          <div>
-            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Contact d'urgence</h3>
-            <dl class="grid grid-cols-1 gap-x-4 gap-y-4">
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Nom du contact</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.emergencyContactName || '-'}}</dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Téléphone du contact</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.emergencyContactPhone || '-'}}</dd>
-              </div>
-            </dl>
+        <!-- Professional -->
+        <div class="rounded-lg border bg-card shadow-sm">
+          <div class="px-6 py-4 border-b">
+            <h3 class="text-sm font-semibold text-card-foreground">Informations professionnelles</h3>
           </div>
+          <div class="px-6 py-4 space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Date d'embauche</span>
+              <span class="text-sm font-medium text-card-foreground">{{formatDate(employee.hireDate)}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Date de fin</span>
+              <span class="text-sm font-medium text-card-foreground">{{formatDate(employee.endDate)}}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-muted-foreground">Statut</span>
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                [ngClass]="getStatusClass(employee.status!)">
+                {{ employee.status }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Departement</span>
+              @if (employee.departement?.id) {
+                <a [routerLink]="['/departments/view', employee.departement!.id]" class="text-sm font-medium text-foreground hover:underline">
+                  {{employee.departement?.name}}
+                </a>
+              } @else {
+                <span class="text-sm font-medium text-card-foreground">-</span>
+              }
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Poste</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.position?.title || '-'}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Manager</span>
+              @if (employee.manager?.id) {
+                <a [routerLink]="['/employees/view', employee.manager!.id]" class="text-sm font-medium text-foreground hover:underline">
+                  {{employee.manager?.firstName}} {{employee.manager?.lastName}}
+                </a>
+              } @else {
+                <span class="text-sm font-medium text-card-foreground">-</span>
+              }
+            </div>
+          </div>
+        </div>
 
-          <!-- Informations bancaires -->
-          <div>
-            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Informations bancaires</h3>
-            <dl class="grid grid-cols-1 gap-x-4 gap-y-4">
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Coordonnées bancaires</dt>
-                <dd class="mt-1 text-sm text-gray-900">{{employee.bankAccountInfo || '-'}}</dd>
-              </div>
-            </dl>
+        <!-- Emergency -->
+        <div class="rounded-lg border bg-card shadow-sm">
+          <div class="px-6 py-4 border-b">
+            <h3 class="text-sm font-semibold text-card-foreground">Contact d'urgence</h3>
+          </div>
+          <div class="px-6 py-4 space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Nom</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.emergencyContactName || '-'}}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Telephone</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.emergencyContactPhone || '-'}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banking -->
+        <div class="rounded-lg border bg-card shadow-sm">
+          <div class="px-6 py-4 border-b">
+            <h3 class="text-sm font-semibold text-card-foreground">Informations bancaires</h3>
+          </div>
+          <div class="px-6 py-4 space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-foreground">Coordonnees bancaires</span>
+              <span class="text-sm font-medium text-card-foreground">{{employee.bankAccountInfo || '-'}}</span>
+            </div>
           </div>
         </div>
       </div>
+    }
 
-      <!-- Documents tab -->
-      <div *ngIf="activeTab === 'documents'" class="px-4 py-5 sm:p-6">
+    <!-- Documents tab -->
+    @if (activeTab === 'documents') {
+      <div class="animate-fade-in">
         <app-employee-documents [employeeId]="employeeId"></app-employee-documents>
       </div>
+    }
 
-      <!-- Contracts tab -->
-      <div *ngIf="activeTab === 'contracts'" class="px-4 py-5 sm:p-6">
+    <!-- Contracts tab -->
+    @if (activeTab === 'contracts') {
+      <div class="animate-fade-in">
         <app-employee-contracts [employeeId]="employeeId"></app-employee-contracts>
       </div>
+    }
 
-      <!-- Leaves tab -->
-      <div *ngIf="activeTab === 'leaves'" class="px-4 py-5 sm:p-6">
-        <div class="text-center py-8">
-          <p class="text-gray-500">La gestion des congés sera implémentée ultérieurement</p>
-        </div>
+    <!-- Leaves tab -->
+    @if (activeTab === 'leaves') {
+      <div class="rounded-lg border bg-card shadow-sm py-12 text-center animate-fade-in">
+        <svg class="mx-auto h-10 w-10 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+        </svg>
+        <p class="mt-3 text-sm text-muted-foreground">La gestion des conges sera implementee ulterieurement</p>
       </div>
-    </div>
-  </div>
+    }
+  }
 </div>
-

@@ -1,52 +1,54 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="md:flex md:items-center md:justify-between">
-    <div class="flex-1 min-w-0">
-      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-        Rapport d'Absentéisme
-      </h2>
-      <p class="mt-1 text-sm text-gray-500">
-        Analyse détaillée des absences et congés
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-foreground">
+        Rapport d'Absenteisme
+      </h1>
+      <p class="text-sm text-muted-foreground mt-1">
+        Analyse detaillee des absences et conges
       </p>
     </div>
-    <div class="mt-4 flex flex-col md:mt-0 md:ml-4">
-      <div class="flex justify-end mb-2">
-        <button (click)="togglePeriodMode()" type="button" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <span *ngIf="!isPeriodMode">Basculer vers période spécifique</span>
-          <span *ngIf="isPeriodMode">Basculer vers vue annuelle</span>
-        </button>
-      </div>
-      <form [formGroup]="filterForm" class="flex items-center space-x-2">
-        <ng-container *ngIf="!isPeriodMode">
-          <div>
-            <label for="year" class="block text-sm font-medium text-gray-700">Année</label>
-            <select id="year" formControlName="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+    <div class="flex flex-col items-end gap-2">
+      <button (click)="togglePeriodMode()" type="button" class="inline-flex items-center rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+        @if (!isPeriodMode) {
+          <span>Basculer vers periode specifique</span>
+        }
+        @if (isPeriodMode) {
+          <span>Basculer vers vue annuelle</span>
+        }
+      </button>
+      <form [formGroup]="filterForm" class="flex items-center gap-3">
+        @if (!isPeriodMode) {
+          <div class="flex flex-col gap-1.5">
+            <label for="year" class="text-sm font-medium text-foreground">Annee</label>
+            <select id="year" formControlName="year" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
               <option [value]="currentYear - 2">{{ currentYear - 2 }}</option>
               <option [value]="currentYear - 1">{{ currentYear - 1 }}</option>
               <option [value]="currentYear">{{ currentYear }}</option>
             </select>
           </div>
-        </ng-container>
-        <ng-container *ngIf="isPeriodMode">
-          <div>
-            <label for="startDate" class="block text-sm font-medium text-gray-700">Date de début</label>
-            <input type="date" id="startDate" formControlName="startDate" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+        }
+        @if (isPeriodMode) {
+          <div class="flex flex-col gap-1.5">
+            <label for="startDate" class="text-sm font-medium text-foreground">Date de debut</label>
+            <input type="date" id="startDate" formControlName="startDate" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
           </div>
-          <div>
-            <label for="endDate" class="block text-sm font-medium text-gray-700">Date de fin</label>
-            <input type="date" id="endDate" formControlName="endDate" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+          <div class="flex flex-col gap-1.5">
+            <label for="endDate" class="text-sm font-medium text-foreground">Date de fin</label>
+            <input type="date" id="endDate" formControlName="endDate" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
           </div>
-          <div class="flex items-end mt-1">
-            <button (click)="loadReport()" type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <div class="flex items-end">
+            <button (click)="loadReport()" type="button" class="inline-flex items-center rounded-md bg-primary px-3 h-9 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
               Appliquer
             </button>
           </div>
-        </ng-container>
-        <div class="ml-2 mt-6">
-          <button (click)="downloadReport()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        }
+        <div class="flex items-end">
+          <button (click)="downloadReport()" type="button" class="inline-flex items-center rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            <svg class="-ml-1 mr-2 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
-            Télécharger
+            Telecharger
           </button>
         </div>
       </form>
@@ -54,193 +56,140 @@
   </div>
 
   <!-- Loading state -->
-  <div *ngIf="loading" class="mt-6 flex justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
+  @if (loading) {
+    <div class="flex justify-center py-12">
+      <svg class="h-8 w-8 animate-spin text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  }
 
   <!-- Error state -->
-  <div *ngIf="error" class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3">
+      <div class="flex items-center gap-3">
+        <svg class="h-5 w-5 text-destructive" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
         </svg>
-      </div>
-      <div class="ml-3">
-        <p class="text-sm text-red-700">{{ error }}</p>
+        <p class="text-sm text-destructive">{{ error }}</p>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Report content -->
-  <div *ngIf="!loading && !error && report" class="mt-8">
+  @if (!loading && !error && report) {
     <!-- Summary cards -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-red-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Taux d'Absentéisme
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.absenteeismRate | percent:'1.1-1' }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Effectif Total
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.totalEmployees }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Jours d'Absence
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.totalAbsenceDays }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Jours Travaillés
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.totalWorkingDays }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Taux d'Absenteisme
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.absenteeismRate }}%
+        </dd>
+      </dl>
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Effectif Total
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.totalEmployees }}
+        </dd>
+      </dl>
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Jours d'Absence
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.totalAbsenceDays }}
+        </dd>
+      </dl>
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Jours Travailles
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.totalWorkingDays }}
+        </dd>
+      </dl>
     </div>
 
     <!-- Monthly absenteeism chart -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Évolution mensuelle de l'absentéisme
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-base font-semibold text-card-foreground">
+          Evolution mensuelle de l'absenteisme
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-          Taux d'absentéisme par mois pour {{ isPeriodMode ? 'la période sélectionnée' : 'l\'année ' + report.year }}
+        <p class="text-sm text-muted-foreground mt-1">
+          Taux d'absenteisme par mois pour {{ isPeriodMode ? 'la periode selectionnee' : 'l\'annee ' + report.year }}
         </p>
       </div>
-      <div class="px-4 py-5 sm:p-6">
-        <!-- Barchart -->
-        <div class="h-80 flex items-end justify-between space-x-2">
-          <ng-container *ngFor="let month of report.monthlyAbsenteeism">
-            <div class="flex flex-col items-center">
-              <div class="relative w-8">
-                <div class="absolute bottom-0 w-full bg-red-500 rounded-t"
-                     [style.height]="getBarHeight(month.absenteeismRate || 0)"></div>
-              </div>
-              <div class="mt-2 text-xs text-gray-500">{{ getMonthName(month.month || 0) }}</div>
-              <div class="text-xs font-medium text-gray-700">{{ month.absenteeismRate | percent:'1.0-1' }}</div>
+      <div class="p-6">
+        <div class="flex items-end justify-between gap-3 h-80">
+          @for (month of report.monthlyAbsenteeism; track month) {
+            <div class="flex-1 flex flex-col items-center h-full justify-end">
+              <div class="w-full max-w-12 bg-red-500 rounded-t transition-all duration-500 min-h-[4px]"
+                [style.height]="getBarHeight(month.absenteeismRate || 0)"></div>
+              <div class="mt-3 text-xs text-muted-foreground truncate w-full text-center">{{ getMonthName(month.month || 0) }}</div>
+              <div class="text-xs font-semibold text-card-foreground">{{ month.absenteeismRate }}%</div>
             </div>
-          </ng-container>
+          }
         </div>
       </div>
     </div>
 
     <!-- Department absenteeism -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Absentéisme par département
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-base font-semibold text-card-foreground">
+          Absenteisme par departement
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-          Analyse de l'absentéisme par département
+        <p class="text-sm text-muted-foreground mt-1">
+          Analyse de l'absenteisme par departement
         </p>
       </div>
-      <div class="px-4 py-5 sm:p-6">
+      <div class="p-6">
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Département
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Effectif
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Jours d'absence
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Taux d'absentéisme
-              </th>
-            </tr>
+          <table class="min-w-full divide-y divide-border">
+            <thead class="border-b bg-muted/50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Departement
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Effectif
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Jours d'absence
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Taux d'absenteisme
+                </th>
+              </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let dept of report?.departmentAbsenteeism">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ dept.departmentName }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ dept.totalEmployees }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ dept.absenceDays }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="w-20 bg-gray-200 rounded-full h-2.5">
-                    <div class="bg-red-600 h-2.5 rounded-full" [style.width]="(dept.absenteeismRate! * 100) + '%'"></div>
-                  </div>
-                  <span class="ml-2 text-sm text-gray-700">{{ dept.absenteeismRate | percent:'1.1-1' }}</span>
-                </div>
-              </td>
-            </tr>
+            <tbody class="divide-y divide-border">
+              @for (dept of report.departmentAbsenteeism; track dept) {
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-card-foreground">
+                    {{ dept.departmentName }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {{ dept.totalEmployees }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {{ dept.absenceDays }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-32 bg-muted rounded-full h-2.5">
+                        <div class="bg-red-600 h-2.5 rounded-full transition-all duration-500" [style.width]="dept.absenteeismRate + '%'"></div>
+                      </div>
+                      <span class="text-sm font-medium text-card-foreground">{{ dept.absenteeismRate }}%</span>
+                    </div>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
@@ -248,61 +197,65 @@
     </div>
 
     <!-- Leave type absenteeism -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Absentéisme par type de congé
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-base font-semibold text-card-foreground">
+          Absenteisme par type de conge
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-          Répartition des absences par type de congé
+        <p class="text-sm text-muted-foreground mt-1">
+          Repartition des absences par type de conge
         </p>
       </div>
-      <div class="px-4 py-5 sm:p-6">
+      <div class="p-6">
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type de congé
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Jours d'absence
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Pourcentage
-              </th>
-            </tr>
+          <table class="min-w-full divide-y divide-border">
+            <thead class="border-b bg-muted/50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Type de conge
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Jours d'absence
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Pourcentage
+                </th>
+              </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let type of report?.leaveTypeAbsenteeism">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ type.leaveTypeName }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ type.absenceDays }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="w-20 bg-gray-200 rounded-full h-2.5">
-                    <div class="bg-blue-600 h-2.5 rounded-full" [style.width]="(type.percentageOfTotal! * 100) + '%'"></div>
-                  </div>
-                  <span class="ml-2 text-sm text-gray-700">{{ type.percentageOfTotal | percent:'1.1-1' }}</span>
-                </div>
-              </td>
-            </tr>
+            <tbody class="divide-y divide-border">
+              @for (type of report.leaveTypeAbsenteeism; track type) {
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-card-foreground">
+                    {{ type.leaveTypeName }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {{ type.absenceDays }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-32 bg-muted rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" [style.width]="type.percentageOfTotal + '%'"></div>
+                      </div>
+                      <span class="text-sm font-medium text-card-foreground">{{ type.percentageOfTotal }}%</span>
+                    </div>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Empty state -->
-  <div *ngIf="!loading && !error && !report" class="mt-8 text-center py-12 bg-white shadow rounded-lg">
-    <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune donnée disponible</h3>
-    <p class="mt-1 text-sm text-gray-500">Aucune donnée d'absentéisme n'est disponible pour la période sélectionnée.</p>
-  </div>
+  @if (!loading && !error && !report) {
+    <div class="rounded-lg border bg-card shadow-sm p-12 text-center">
+      <svg class="mx-auto h-12 w-12 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-card-foreground">Aucune donnee disponible</h3>
+      <p class="mt-1 text-sm text-muted-foreground">Aucune donnee d'absenteisme n'est disponible pour la periode selectionnee.</p>
+    </div>
+  }
 </div>

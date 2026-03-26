@@ -1,227 +1,198 @@
-<div class="px-4 sm:px-6 lg:px-8 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-2xl font-semibold text-gray-900">Employés</h1>
-      <p class="mt-2 text-sm text-gray-700">Liste complète des employés de l'entreprise</p>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-foreground">Employes</h1>
+      <p class="text-sm text-muted-foreground mt-1">Liste complete des employes de l'entreprise</p>
     </div>
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-      <a routerLink="/employees/create" class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto">
-        Ajouter un employé
-      </a>
-    </div>
+    <a routerLink="/employees/create"
+      class="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Ajouter un employe
+    </a>
   </div>
 
-  <!-- Filtres -->
-  <div class="mt-6 bg-white shadow rounded-lg p-4">
+  <!-- Filters -->
+  <div class="rounded-lg border bg-card shadow-sm p-4">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-      <div>
-        <label for="search" class="block text-sm font-medium text-gray-700">Recherche</label>
-        <div class="mt-1">
-          <input type="text" [(ngModel)]="searchTerm" id="search" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Nom, prénom...">
-        </div>
+      <div class="space-y-1.5">
+        <label for="search" class="text-sm font-medium text-foreground">Recherche</label>
+        <input type="text" [(ngModel)]="searchTerm" id="search" placeholder="Nom, prenom..."
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
       </div>
-
-      <div>
-        <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
-        <div class="mt-1">
-          <select [(ngModel)]="selectedStatus" id="status" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-            <option value="">Tous les statuts</option>
-            <option *ngFor="let status of statuses" [value]="status">{{status}}</option>
-          </select>
-        </div>
+      <div class="space-y-1.5">
+        <label for="status" class="text-sm font-medium text-foreground">Statut</label>
+        <select [(ngModel)]="selectedStatus" id="status"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+          <option value="">Tous les statuts</option>
+          @for (status of statuses; track status) {
+            <option [value]="status">{{status}}</option>
+          }
+        </select>
       </div>
-
-      <div>
-        <label for="department" class="block text-sm font-medium text-gray-700">Département</label>
-        <div class="mt-1">
-          <select [(ngModel)]="selectedDepartment" id="department" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-            <option value="">Tous les départements</option>
-            <option *ngFor="let dept of departments" [value]="dept.id">{{dept.name}}</option>
-          </select>
-        </div>
+      <div class="space-y-1.5">
+        <label for="department" class="text-sm font-medium text-foreground">Departement</label>
+        <select [(ngModel)]="selectedDepartment" id="department"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+          <option value="">Tous les departements</option>
+          @for (dept of departments; track dept) {
+            <option [value]="dept.id">{{dept.name}}</option>
+          }
+        </select>
       </div>
-
-      <div class="flex items-end space-x-2">
-        <button (click)="applyFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+      <div class="flex items-end gap-2">
+        <button (click)="applyFilters()" type="button"
+          class="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
           Filtrer
         </button>
-        <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          Réinitialiser
+        <button (click)="resetFilters()" type="button"
+          class="inline-flex items-center rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+          Reinitialiser
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Loading state -->
-  <div *ngIf="loading" class="mt-8 flex justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex justify-center py-12">
+      <svg class="animate-spin h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  }
 
-  <!-- Error state -->
-  <div *ngIf="error" class="mt-8 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+  <!-- Error -->
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3 animate-fade-in">
+      <div class="flex items-center gap-2">
+        <svg class="h-4 w-4 text-destructive shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
         </svg>
-      </div>
-      <div class="ml-3">
-        <p>{{ error }}</p>
+        <p class="text-sm text-destructive">{{ error }}</p>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Table -->
-  <div *ngIf="!loading && !error && filteredEmployees.length > 0" class="mt-8 flex flex-col">
-    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-300">
-            <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                Employé
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Poste
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Département
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Date d'embauche
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Statut
-              </th>
-              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                <span class="sr-only">Actions</span>
-              </th>
+  @if (!loading && !error && filteredEmployees.length > 0) {
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b bg-muted/50">
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Employe</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Poste</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Departement</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Embauche</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Statut</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
             </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-            <tr *ngFor="let employee of filteredEmployees">
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                <div class="flex items-center">
-                  <div class="h-10 w-10 flex-shrink-0">
-                    <img class="h-10 w-10 rounded-full"
-                         src="https://ui-avatars.com/api/?name={{employee.firstName}}+{{employee.lastName}}&background=0D8ABC&color=fff"
-                         alt="">
+          </thead>
+          <tbody class="divide-y">
+            @for (employee of filteredEmployees; track employee.id) {
+              <tr class="hover:bg-muted/50 transition-colors">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <img class="h-8 w-8 rounded-full ring-1 ring-border"
+                      src="https://ui-avatars.com/api/?name={{employee.firstName}}+{{employee.lastName}}&background=18181b&color=fafafa&size=32"
+                      alt="">
+                    <div>
+                      <p class="text-sm font-medium text-card-foreground">{{employee.firstName}} {{employee.lastName}}</p>
+                      <p class="text-xs text-muted-foreground">{{employee.address}}</p>
+                    </div>
                   </div>
-                  <div class="ml-4">
-                    <div class="font-medium text-gray-900">{{employee.firstName}} {{employee.lastName}}</div>
-                    <div class="text-gray-500">{{employee.address}}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                <div class="text-gray-900">{{employee.position?.title || '-'}}</div>
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                {{employee.departement?.name || '-'}}
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                {{formatDate(employee.hireDate)}}
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
-                        [ngClass]="getStatusClass(employee.status ?? '')">
-                        {{employee.status ?? ''}}
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-card-foreground">{{employee.position?.title || '-'}}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">{{employee.departement?.name || '-'}}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">{{formatDate(employee.hireDate)}}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="getStatusClass(employee.status ?? '')">
+                    {{employee.status ?? ''}}
                   </span>
-              </td>
-              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a [routerLink]="['/employees/view', employee.id]" class="text-blue-600 hover:text-blue-900 mr-4">Voir</a>
-                <a [routerLink]="['/employees/edit', employee.id]" class="text-blue-600 hover:text-blue-900">Modifier</a>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <a [routerLink]="['/employees/view', employee.id]"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                      title="Voir">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                    </a>
+                    <a [routerLink]="['/employees/edit', employee.id]"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                      title="Modifier">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                      </svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
+  }
 
-  <!-- Empty state -->
-  <div *ngIf="!loading && !error && filteredEmployees.length === 0" class="mt-8 text-center py-12 bg-white rounded-lg shadow">
-    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-    </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun employé trouvé</h3>
-    <p class="mt-1 text-sm text-gray-500">
-      Aucun employé ne correspond à vos critères de recherche.
-    </p>
-    <div class="mt-6">
-      <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-        Réinitialiser les filtres
+  <!-- Empty -->
+  @if (!loading && !error && filteredEmployees.length === 0) {
+    <div class="rounded-lg border bg-card shadow-sm py-12 text-center">
+      <svg class="mx-auto h-10 w-10 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+      </svg>
+      <h3 class="mt-3 text-sm font-semibold text-card-foreground">Aucun employe trouve</h3>
+      <p class="mt-1 text-sm text-muted-foreground">Aucun employe ne correspond a vos criteres.</p>
+      <button (click)="resetFilters()" type="button"
+        class="mt-4 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+        Reinitialiser les filtres
       </button>
     </div>
-  </div>
+  }
 
   <!-- Pagination -->
-  <div *ngIf="!loading && !error && totalItems > 0" class="mt-5 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-    <div class="flex flex-1 justify-between sm:hidden">
-      <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
-              class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              [class.opacity-50]="currentPage === 0"
-              [class.cursor-not-allowed]="currentPage === 0">
-        Précédent
-      </button>
-      <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
-              class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              [class.opacity-50]="currentPage === totalPages - 1"
-              [class.cursor-not-allowed]="currentPage === totalPages - 1">
-        Suivant
-      </button>
-    </div>
-    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-      <div>
-        <p class="text-sm text-gray-700">
-          Affichage de <span class="font-medium">{{ currentPage * pageSize + 1 }}</span> à
-          <span class="font-medium">{{ Math.min((currentPage + 1) * pageSize, totalItems) }}</span> sur
-          <span class="font-medium">{{ totalItems }}</span> résultats
-        </p>
-      </div>
-      <div>
-        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-          <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
-                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                  [class.opacity-50]="currentPage === 0"
-                  [class.cursor-not-allowed]="currentPage === 0">
-            <span class="sr-only">Précédent</span>
-            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-            </svg>
+  @if (!loading && !error && totalItems > 0) {
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-muted-foreground">
+        {{ currentPage * pageSize + 1 }} - {{ Math.min((currentPage + 1) * pageSize, totalItems) }} sur {{ totalItems }} resultats
+      </p>
+      <div class="flex items-center gap-1">
+        <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)" type="button" title="Page precedente"
+          class="inline-flex items-center justify-center rounded-md h-8 w-8 border border-input bg-background text-muted-foreground hover:bg-accent transition-colors disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        @for (page of [].constructor(totalPages); track $index; let i = $index) {
+          <button (click)="changePage(i)"
+            class="inline-flex items-center justify-center rounded-md h-8 min-w-8 px-2 text-sm font-medium transition-colors"
+            [class.bg-primary]="currentPage === i"
+            [class.text-primary-foreground]="currentPage === i"
+            [class.border]="currentPage !== i"
+            [class.border-input]="currentPage !== i"
+            [class.bg-background]="currentPage !== i"
+            [class.text-foreground]="currentPage !== i"
+            [class.hover:bg-accent]="currentPage !== i">
+            {{ i + 1 }}
           </button>
-
-          <!-- Page numbers -->
-          <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
-            <button (click)="changePage(i)"
-                    class="relative inline-flex items-center border border-gray-300 px-4 py-2 text-sm font-medium focus:z-20"
-                    [class.z-10]="currentPage === i"
-                    [class.bg-blue-50]="currentPage === i"
-                    [class.border-blue-500]="currentPage === i"
-                    [class.text-blue-600]="currentPage === i"
-                    [class.bg-white]="currentPage !== i"
-                    [class.text-gray-500]="currentPage !== i"
-                    [class.hover:bg-gray-50]="currentPage !== i">
-              {{ i + 1 }}
-            </button>
-          </ng-container>
-
-          <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
-                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                  [class.opacity-50]="currentPage === totalPages - 1"
-                  [class.cursor-not-allowed]="currentPage === totalPages - 1">
-            <span class="sr-only">Suivant</span>
-            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </nav>
+        }
+        <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)" type="button" title="Page suivante"
+          class="inline-flex items-center justify-center rounded-md h-8 w-8 border border-input bg-background text-muted-foreground hover:bg-accent transition-colors disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+          </svg>
+        </button>
       </div>
     </div>
-  </div>
+  }
 </div>

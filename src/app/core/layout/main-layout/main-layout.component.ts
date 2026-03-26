@@ -7,7 +7,7 @@ import {SidebarComponent} from '../../../shared/components/sidebar/sidebar.compo
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent, NavbarComponent, NavbarComponent, SidebarComponent],
+  imports: [CommonModule, RouterModule, SidebarComponent, NavbarComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css'
 })

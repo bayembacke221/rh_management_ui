@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CongesService } from '../../../services/services/conges.service';
@@ -13,7 +13,7 @@ import { catchError, finalize } from 'rxjs/operators';
 @Component({
   selector: 'app-leave-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [RouterModule, ReactiveFormsModule],
   templateUrl: './leave-form.component.html',
 })
 export class LeaveFormComponent implements OnInit {

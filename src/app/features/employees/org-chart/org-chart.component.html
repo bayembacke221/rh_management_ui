@@ -1,119 +1,114 @@
-<div class="px-4 sm:px-6 lg:px-8 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-2xl font-semibold text-gray-900">Organigramme</h1>
-      <p class="mt-2 text-sm text-gray-700">Visualisation de la structure hiérarchique de l'entreprise</p>
-    </div>
+<div class="space-y-6">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight text-foreground">Organigramme</h1>
+    <p class="text-sm text-muted-foreground mt-1">Structure hierarchique de l'entreprise</p>
   </div>
 
-  <!-- Filtres -->
-  <div class="mt-6 bg-white shadow rounded-lg p-4">
+  <!-- Filters -->
+  <div class="rounded-lg border bg-card shadow-sm p-4">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div>
-        <label for="department" class="block text-sm font-medium text-gray-700">Département</label>
-        <div class="mt-1">
-          <select [(ngModel)]="selectedDepartment" id="department" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-            <option value="">Tous les départements</option>
-            <option *ngFor="let dept of departments" [value]="dept.name">{{dept.name}}</option>
-          </select>
+      <div class="space-y-1.5">
+        <label for="department" class="text-sm font-medium text-foreground">Departement</label>
+        <select [(ngModel)]="selectedDepartment" id="department"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+          <option value="">Tous les departements</option>
+          @for (dept of departments; track dept) {
+            <option [value]="dept.name">{{dept.name}}</option>
+          }
+        </select>
+      </div>
+      <div class="flex items-end">
+        <div class="flex items-center gap-2">
+          <input [(ngModel)]="expandAll" (change)="expandAllNodes(expandAll)" id="expandAll" type="checkbox"
+            class="h-4 w-4 rounded border border-input bg-transparent shadow-sm accent-primary">
+          <label for="expandAll" class="text-sm font-medium text-foreground cursor-pointer">Tout developper</label>
         </div>
       </div>
-
-      <div class="flex items-center mt-6 sm:mt-0">
-        <div class="flex items-center h-5">
-          <input [(ngModel)]="expandAll" (change)="expandAllNodes(expandAll)" id="expandAll" type="checkbox" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-        </div>
-        <div class="ml-3">
-          <label for="expandAll" class="text-sm font-medium text-gray-700">Tout développer</label>
-        </div>
-      </div>
-
-      <div class="flex items-end space-x-2">
-        <button (click)="applyFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-          </svg>
+      <div class="flex items-end gap-2">
+        <button (click)="applyFilters()" type="button"
+          class="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
           Filtrer
         </button>
-        <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          Réinitialiser
+        <button (click)="resetFilters()" type="button"
+          class="inline-flex items-center rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+          Reinitialiser
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Loading state -->
-  <div *ngIf="loading" class="mt-8 flex justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex justify-center py-12">
+      <svg class="animate-spin h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  }
 
-  <!-- Error state -->
-  <div *ngIf="error" class="mt-8 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+  <!-- Error -->
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3">
+      <div class="flex items-center gap-2">
+        <svg class="h-4 w-4 text-destructive shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
         </svg>
-      </div>
-      <div class="ml-3">
-        <p>{{ error }}</p>
+        <p class="text-sm text-destructive">{{ error }}</p>
       </div>
     </div>
-  </div>
+  }
 
-  <!-- Empty state -->
-  <div *ngIf="!loading && !error && orgChartData.length === 0" class="mt-8 text-center py-12 bg-white rounded-lg shadow">
-    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-    </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun organigramme disponible</h3>
-    <p class="mt-1 text-sm text-gray-500">
-      La structure hiérarchique n'a pas encore été définie.
-    </p>
-  </div>
+  <!-- Empty -->
+  @if (!loading && !error && orgChartData.length === 0) {
+    <div class="rounded-lg border bg-card shadow-sm py-12 text-center">
+      <svg class="mx-auto h-10 w-10 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+      </svg>
+      <h3 class="mt-3 text-sm font-semibold text-card-foreground">Aucun organigramme disponible</h3>
+      <p class="mt-1 text-sm text-muted-foreground">La structure hierarchique n'a pas encore ete definie.</p>
+    </div>
+  }
 
   <!-- Org Chart -->
-  <div *ngIf="!loading && !error && orgChartData.length > 0" class="mt-8 bg-white p-6 rounded-lg shadow">
-    <div class="org-chart">
-      <div class="org-chart-container">
-        <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: orgChartData }"></ng-container>
-      </div>
+  @if (!loading && !error && orgChartData.length > 0) {
+    <div class="rounded-lg border bg-card shadow-sm p-6">
+      <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: orgChartData }"></ng-container>
     </div>
-  </div>
+  }
 
-  <!-- Node Template (récursif) -->
+  <!-- Node Template -->
   <ng-template #nodeTemplate let-nodes>
-    <ul class="org-chart-nodes">
-      <li *ngFor="let node of nodes" class="org-chart-node">
-        <div class="org-chart-person">
-          <div class="flex items-center p-4 bg-white rounded-lg shadow border border-gray-200 hover:bg-gray-50">
-            <img [src]="node.img" class="w-12 h-12 rounded-full mr-4" [alt]="node.name">
-            <div class="flex-1">
-              <h3 class="text-sm font-medium text-gray-900">
-                <a [routerLink]="['/departments/view', node.id]" class="hover:underline">{{node.name}}</a>
-              </h3>
-              <p class="text-xs text-gray-500">Code: {{node.title}}</p>
-              <p class="text-xs text-gray-500">Manager: {{node.manager}}</p>
-              <span class="mt-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                {{node.department}}
-              </span>
+    <div class="space-y-2">
+      @for (node of nodes; track node.id) {
+        <div>
+          <div class="flex items-center gap-3 rounded-lg border bg-background p-3 hover:bg-muted/50 transition-colors">
+            <img [src]="node.img" class="w-10 h-10 rounded-full ring-1 ring-border shrink-0" [alt]="node.name" [title]="node.name">
+            <div class="min-w-0 flex-1">
+              <a [routerLink]="['/departments/view', node.id]" class="text-sm font-medium text-card-foreground hover:underline">{{node.name}}</a>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">{{node.title}}</span>
+                <span class="text-xs text-muted-foreground">Manager: {{node.manager}}</span>
+              </div>
             </div>
-            <div *ngIf="node.children && node.children.length > 0" class="ml-2">
-              <button (click)="toggleNode(node)" class="text-gray-400 hover:text-gray-500">
-                <svg class="h-5 w-5 transform transition-transform duration-200" [ngClass]="{'rotate-90': node.expanded}"
-                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            @if (node.children && node.children.length > 0) {
+              <button (click)="toggleNode(node)" type="button" title="Developper"
+                class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors shrink-0">
+                <svg class="h-4 w-4 transition-transform duration-200" [class.rotate-90]="node.expanded"
+                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                 </svg>
               </button>
+            }
+          </div>
+          @if (node.children && node.children.length > 0 && node.expanded) {
+            <div class="ml-8 mt-2 pl-4 border-l-2 border-border animate-fade-in">
+              <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: node.children }"></ng-container>
             </div>
-          </div>
-
-          <!-- Children (conditionally rendered) -->
-          <div *ngIf="node.children && node.children.length > 0 && node.expanded" class="org-chart-children ml-12 mt-4">
-            <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: node.children }"></ng-container>
-          </div>
+          }
         </div>
-      </li>
-    </ul>
+      }
+    </div>
   </ng-template>
 </div>

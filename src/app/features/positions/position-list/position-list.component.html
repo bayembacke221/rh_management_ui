@@ -1,227 +1,194 @@
-<div class="px-4 sm:px-6 lg:px-8 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-2xl font-semibold text-gray-900">Postes</h1>
-      <p class="mt-2 text-sm text-gray-700">Liste complète des postes disponibles dans l'entreprise</p>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-foreground">Postes</h1>
+      <p class="text-sm text-muted-foreground mt-1">Liste complete des postes disponibles</p>
     </div>
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-      <a routerLink="/positions/create" class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto">
-        Ajouter un poste
-      </a>
-    </div>
+    <a routerLink="/positions/create"
+      class="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Ajouter un poste
+    </a>
   </div>
 
-  <!-- Filtres -->
-  <div class="mt-6 bg-white shadow rounded-lg p-4">
+  <!-- Filters -->
+  <div class="rounded-lg border bg-card shadow-sm p-4">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-      <div>
-        <label for="search" class="block text-sm font-medium text-gray-700">Recherche</label>
-        <div class="mt-1">
-          <input type="text" [(ngModel)]="searchTerm" id="search" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Titre, description...">
+      <div class="space-y-1.5">
+        <label for="search" class="text-sm font-medium text-foreground">Recherche</label>
+        <input type="text" [(ngModel)]="searchTerm" id="search" placeholder="Titre, description..."
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+      </div>
+      <div class="space-y-1.5">
+        <label for="department" class="text-sm font-medium text-foreground">Departement</label>
+        <select [(ngModel)]="selectedDepartment" id="department"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+          <option value="">Tous les departements</option>
+          @for (dept of departments; track dept) {
+            <option [value]="dept.id">{{dept.name}}</option>
+          }
+        </select>
+      </div>
+      <div class="flex items-end">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="activeOnly" id="activeOnly"
+            class="h-4 w-4 rounded border border-input bg-transparent shadow-sm accent-primary">
+          <label for="activeOnly" class="text-sm font-medium text-foreground cursor-pointer">Actifs uniquement</label>
         </div>
       </div>
-
-      <div>
-        <label for="department" class="block text-sm font-medium text-gray-700">Département</label>
-        <div class="mt-1">
-          <select [(ngModel)]="selectedDepartment" id="department" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
-            <option value="">Tous les départements</option>
-            <option *ngFor="let dept of departments" [value]="dept.id">{{dept.name}}</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
-        <div class="mt-1">
-          <div class="flex items-center">
-            <input type="checkbox" [(ngModel)]="activeOnly" id="status" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-            <label for="status" class="ml-2 block text-sm text-gray-900">
-              Positions actives uniquement
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-end space-x-2">
-        <button (click)="applyFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-          </svg>
+      <div class="flex items-end gap-2">
+        <button (click)="applyFilters()" type="button"
+          class="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 h-9 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
           Filtrer
         </button>
-        <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          Réinitialiser
+        <button (click)="resetFilters()" type="button"
+          class="inline-flex items-center rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+          Reinitialiser
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Loading state -->
-  <div *ngIf="loading" class="mt-8 flex justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex justify-center py-12">
+      <svg class="animate-spin h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  }
 
-  <!-- Error state -->
-  <div *ngIf="error" class="mt-8 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+  <!-- Error -->
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3 animate-fade-in">
+      <div class="flex items-center gap-2">
+        <svg class="h-4 w-4 text-destructive shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
         </svg>
-      </div>
-      <div class="ml-3">
-        <p>{{ error }}</p>
+        <p class="text-sm text-destructive">{{ error }}</p>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Table -->
-  <div *ngIf="!loading && !error && filteredPositions.length > 0" class="mt-8 flex flex-col">
-    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-300">
-            <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                Titre
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Département
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Grade
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Plage salariale
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                Statut
-              </th>
-              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                <span class="sr-only">Actions</span>
-              </th>
+  @if (!loading && !error && filteredPositions.length > 0) {
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b bg-muted/50">
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Titre</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Departement</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Grade</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Plage salariale</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Statut</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
             </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-            <tr *ngFor="let position of filteredPositions">
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                {{position.title || '-'}}
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                {{position.department?.name || '-'}}
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                {{position.grade || '-'}}
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                {{formatSalaryRange(position.minSalary, position.maxSalary)}}
-              </td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
-                      [ngClass]="position.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                  {{position.active ? 'Actif' : 'Inactif'}}
-                </span>
-              </td>
-              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a [routerLink]="['/positions/view', position.id]" class="text-blue-600 hover:text-blue-900 mr-4">Voir</a>
-                <a [routerLink]="['/positions/edit', position.id]" class="text-blue-600 hover:text-blue-900 mr-4">Modifier</a>
-
-                <button (click)="togglePositionStatus(position)" class="text-blue-600 hover:text-blue-900 mr-4">
-                  {{position.active ? 'Désactiver' : 'Activer'}}
-                </button>
-
-                <button (click)="deletePosition(position)" class="text-red-600 hover:text-red-900">
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+          </thead>
+          <tbody class="divide-y">
+            @for (position of filteredPositions; track position.id) {
+              <tr class="hover:bg-muted/50 transition-colors">
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-card-foreground">{{position.title || '-'}}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">{{position.department?.name || '-'}}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">{{position.grade || '-'}}</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">{{formatSalaryRange(position.minSalary, position.maxSalary)}}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="position.active ? 'bg-green-500/10 text-green-600' : 'bg-destructive/10 text-destructive'">
+                    {{position.active ? 'Actif' : 'Inactif'}}
+                  </span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <a [routerLink]="['/positions/view', position.id]" title="Voir"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                    </a>
+                    <a [routerLink]="['/positions/edit', position.id]" title="Modifier"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                      </svg>
+                    </a>
+                    <button (click)="togglePositionStatus(position)" type="button" title="Toggle statut"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" />
+                      </svg>
+                    </button>
+                    <button (click)="deletePosition(position)" type="button" title="Supprimer"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
+  }
 
-  <!-- Empty state -->
-  <div *ngIf="!loading && !error && filteredPositions.length === 0" class="mt-8 text-center py-12 bg-white rounded-lg shadow">
-    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-    </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun poste trouvé</h3>
-    <p class="mt-1 text-sm text-gray-500">
-      Aucun poste ne correspond à vos critères de recherche.
-    </p>
-    <div class="mt-6">
-      <button (click)="resetFilters()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-        Réinitialiser les filtres
+  <!-- Empty -->
+  @if (!loading && !error && filteredPositions.length === 0) {
+    <div class="rounded-lg border bg-card shadow-sm py-12 text-center">
+      <svg class="mx-auto h-10 w-10 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
+      </svg>
+      <h3 class="mt-3 text-sm font-semibold text-card-foreground">Aucun poste trouve</h3>
+      <p class="mt-1 text-sm text-muted-foreground">Aucun poste ne correspond a vos criteres.</p>
+      <button (click)="resetFilters()" type="button"
+        class="mt-4 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+        Reinitialiser les filtres
       </button>
     </div>
-  </div>
+  }
 
   <!-- Pagination -->
-  <div *ngIf="!loading && !error && totalItems > 0" class="mt-5 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-    <div class="flex flex-1 justify-between sm:hidden">
-      <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
-              class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              [class.opacity-50]="currentPage === 0"
-              [class.cursor-not-allowed]="currentPage === 0">
-        Précédent
-      </button>
-      <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
-              class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              [class.opacity-50]="currentPage === totalPages - 1"
-              [class.cursor-not-allowed]="currentPage === totalPages - 1">
-        Suivant
-      </button>
-    </div>
-    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-      <div>
-        <p class="text-sm text-gray-700">
-          Affichage de <span class="font-medium">{{ currentPage * pageSize + 1 }}</span> à
-          <span class="font-medium">{{ Math.min((currentPage + 1) * pageSize, totalItems) }}</span> sur
-          <span class="font-medium">{{ totalItems }}</span> résultats
-        </p>
-      </div>
-      <div>
-        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-          <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)"
-                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                  [class.opacity-50]="currentPage === 0"
-                  [class.cursor-not-allowed]="currentPage === 0">
-            <span class="sr-only">Précédent</span>
-            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-            </svg>
+  @if (!loading && !error && totalItems > 0) {
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-muted-foreground">
+        {{ currentPage * pageSize + 1 }} - {{ Math.min((currentPage + 1) * pageSize, totalItems) }} sur {{ totalItems }} resultats
+      </p>
+      <div class="flex items-center gap-1">
+        <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)" type="button" title="Precedent"
+          class="inline-flex items-center justify-center rounded-md h-8 w-8 border border-input bg-background text-muted-foreground hover:bg-accent transition-colors disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        @for (page of [].constructor(totalPages); track $index; let i = $index) {
+          <button (click)="changePage(i)" type="button"
+            class="inline-flex items-center justify-center rounded-md h-8 min-w-8 px-2 text-sm font-medium transition-colors"
+            [class.bg-primary]="currentPage === i"
+            [class.text-primary-foreground]="currentPage === i"
+            [class.border]="currentPage !== i"
+            [class.border-input]="currentPage !== i"
+            [class.bg-background]="currentPage !== i"
+            [class.text-foreground]="currentPage !== i"
+            [class.hover:bg-accent]="currentPage !== i">
+            {{ i + 1 }}
           </button>
-
-          <!-- Page numbers -->
-          <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
-            <button (click)="changePage(i)"
-                    class="relative inline-flex items-center border border-gray-300 px-4 py-2 text-sm font-medium focus:z-20"
-                    [class.z-10]="currentPage === i"
-                    [class.bg-blue-50]="currentPage === i"
-                    [class.border-blue-500]="currentPage === i"
-                    [class.text-blue-600]="currentPage === i"
-                    [class.bg-white]="currentPage !== i"
-                    [class.text-gray-500]="currentPage !== i"
-                    [class.hover:bg-gray-50]="currentPage !== i">
-              {{ i + 1 }}
-            </button>
-          </ng-container>
-
-          <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)"
-                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                  [class.opacity-50]="currentPage === totalPages - 1"
-                  [class.cursor-not-allowed]="currentPage === totalPages - 1">
-            <span class="sr-only">Suivant</span>
-            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </nav>
+        }
+        <button [disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)" type="button" title="Suivant"
+          class="inline-flex items-center justify-center rounded-md h-8 w-8 border border-input bg-background text-muted-foreground hover:bg-accent transition-colors disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+          </svg>
+        </button>
       </div>
     </div>
-  </div>
+  }
 </div>

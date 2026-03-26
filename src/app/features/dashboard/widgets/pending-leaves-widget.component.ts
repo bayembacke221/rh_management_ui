@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { CongesService } from '../../../services/services/conges.service';
 import { LeaveDto } from '../../../services/models/leave-dto';
@@ -7,72 +7,80 @@ import { LeaveDto } from '../../../services/models/leave-dto';
 @Component({
   selector: 'app-pending-leaves-widget',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
-   <div class="bg-white shadow rounded-lg overflow-hidden">
-     <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-       <div>
-         <h3 class="text-lg leading-6 font-medium text-gray-900">Demandes de congés en attente</h3>
-         <p class="mt-1 max-w-2xl text-sm text-gray-500">Demandes nécessitant votre approbation</p>
-       </div>
-       <a routerLink="/leaves" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-         Voir toutes les demandes
-       </a>
-     </div>
+    <div class="rounded-lg border bg-card shadow-sm">
+      <div class="flex items-center justify-between px-6 py-4 border-b">
+        <div>
+          <h3 class="text-sm font-semibold text-card-foreground">Demandes de conges en attente</h3>
+          <p class="text-xs text-muted-foreground mt-0.5">Demandes necessitant votre approbation</p>
+        </div>
+        <a routerLink="/leaves" class="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+          Voir tout
+        </a>
+      </div>
 
-     <div *ngIf="loading" class="px-4 py-5 sm:p-6 flex justify-center">
-       <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-     </div>
+      @if (loading) {
+        <div class="flex justify-center py-8">
+          <svg class="animate-spin h-6 w-6 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+      }
 
-     <div *ngIf="error" class="px-4 py-5 sm:p-6 text-center text-red-500">
-       {{ error }}
-     </div>
+      @if (error) {
+        <div class="px-6 py-6 text-center">
+          <p class="text-sm text-destructive">{{ error }}</p>
+        </div>
+      }
 
-     <div *ngIf="!loading && !error && pendingLeaves.length === 0" class="px-4 py-5 sm:p-6 text-center text-gray-500">
-       <p>Aucune demande en attente.</p>
-     </div>
+      @if (!loading && !error && pendingLeaves.length === 0) {
+        <div class="px-6 py-8 text-center text-sm text-muted-foreground">
+          Aucune demande en attente
+        </div>
+      }
 
-     <ul *ngIf="!loading && !error && pendingLeaves.length > 0" class="divide-y divide-gray-200">
-       <li *ngFor="let leave of pendingLeaves" class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-         <div class="flex items-center justify-between">
-           <div class="flex items-center">
-             <div class="flex-shrink-0 h-10 w-10">
-               <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{leave.employee?.firstName}}+{{leave.employee?.lastName}}&background=0D8ABC&color=fff" alt="">
-             </div>
-             <div class="ml-4">
-               <div class="text-sm font-medium text-gray-900">
-                 {{ leave.employee?.firstName }} {{ leave.employee?.lastName }}
-               </div>
-               <div class="text-sm text-gray-500">
-                 {{ getLeaveTypeName(leave.leaveType) }}
-               </div>
-             </div>
-           </div>
-           <div class="text-right">
-             <div class="text-sm text-gray-900">
-               {{ formatDate(leave.startDate) }} - {{ formatDate(leave.endDate) }}
-             </div>
-             <div class="text-sm text-gray-500">
-               {{ leave.durationDays }} jour(s)
-             </div>
-           </div>
-         </div>
-         <div class="mt-2 flex justify-end space-x-2">
-           <button
-             (click)="rejectLeave(leave.id)"
-             class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-             Refuser
-           </button>
-           <button
-             (click)="approveLeave(leave.id)"
-             class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-             Approuver
-           </button>
-         </div>
-       </li>
-     </ul>
-   </div>
- `,
+      @if (!loading && !error && pendingLeaves.length > 0) {
+        <div class="divide-y">
+          @for (leave of pendingLeaves; track leave.id) {
+            <div class="px-6 py-3 hover:bg-muted/50 transition-colors">
+              <div class="flex items-center gap-4">
+                <img
+                  class="h-9 w-9 rounded-full ring-1 ring-border shrink-0"
+                  src="https://ui-avatars.com/api/?name={{leave.employee?.firstName}}+{{leave.employee?.lastName}}&background=18181b&color=fafafa&size=36"
+                  alt="">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-medium text-card-foreground truncate">
+                      {{ leave.employee?.firstName }} {{ leave.employee?.lastName }}
+                    </p>
+                    <span class="text-xs text-muted-foreground shrink-0">{{ leave.durationDays }}j</span>
+                  </div>
+                  <p class="text-xs text-muted-foreground mt-0.5">{{ getLeaveTypeName(leave.leaveType) }}</p>
+                  <p class="text-xs text-muted-foreground">{{ formatDate(leave.startDate) }} - {{ formatDate(leave.endDate) }}</p>
+                </div>
+              </div>
+              <div class="mt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  (click)="rejectLeave(leave.id)"
+                  class="inline-flex items-center rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors">
+                  Refuser
+                </button>
+                <button
+                  type="button"
+                  (click)="approveLeave(leave.id)"
+                  class="inline-flex items-center rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+                  Approuver
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  `,
 })
 export class PendingLeavesWidgetComponent implements OnInit {
   pendingLeaves: LeaveDto[] = [];

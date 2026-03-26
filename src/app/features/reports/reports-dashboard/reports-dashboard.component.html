@@ -1,166 +1,151 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="md:flex md:items-center md:justify-between">
-    <div class="flex-1 min-w-0">
-      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-        Rapports RH
-      </h2>
-      <p class="mt-1 text-sm text-gray-500">
-        Visualisez et générez des rapports sur les données RH de votre organisation
-      </p>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-foreground">Rapports RH</h1>
+      <p class="text-sm text-muted-foreground mt-1">Visualisez et generez des rapports sur les donnees RH</p>
     </div>
-    <div class="mt-4 flex md:mt-0 md:ml-4">
-      <form [formGroup]="filterForm" class="flex items-center space-x-2">
-        <div>
-          <label for="year" class="block text-sm font-medium text-gray-700">Année</label>
-          <select id="year" formControlName="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-            <option [value]="currentYear - 2">{{ currentYear - 2 }}</option>
-            <option [value]="currentYear - 1">{{ currentYear - 1 }}</option>
-            <option [value]="currentYear">{{ currentYear }}</option>
-          </select>
-        </div>
-      </form>
-    </div>
+    <form [formGroup]="filterForm">
+      <div class="space-y-1.5">
+        <label for="year" class="text-sm font-medium text-foreground">Annee</label>
+        <select id="year" formControlName="year"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+          <option [value]="currentYear - 2">{{ currentYear - 2 }}</option>
+          <option [value]="currentYear - 1">{{ currentYear - 1 }}</option>
+          <option [value]="currentYear">{{ currentYear }}</option>
+        </select>
+      </div>
+    </form>
   </div>
 
-  <!-- Loading state -->
-  <div *ngIf="loading" class="mt-6 flex justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex justify-center py-12">
+      <svg class="animate-spin h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  }
 
-  <!-- Error state -->
-  <div *ngIf="error" class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+  <!-- Error -->
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3 animate-fade-in">
+      <div class="flex items-center gap-2">
+        <svg class="h-4 w-4 text-destructive shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
         </svg>
-      </div>
-      <div class="ml-3">
-        <p class="text-sm text-red-700">{{ error }}</p>
+        <p class="text-sm text-destructive">{{ error }}</p>
       </div>
     </div>
-  </div>
+  }
 
-  <!-- Report Cards Grid -->
-  <div *ngIf="!loading && !error" class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
-    <!-- Turnover Report Card -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-6">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+  <!-- Report cards -->
+  @if (!loading && !error) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <!-- Turnover -->
+      <div class="rounded-lg border bg-card shadow-sm p-6">
+        <div class="flex items-center gap-4">
+          <div class="rounded-lg bg-muted p-3 shrink-0">
+            <svg class="h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
             </svg>
           </div>
-          <div class="ml-5">
-            <h3 class="text-lg font-medium text-gray-900">Rapport de Turnover</h3>
-            <p class="text-sm text-gray-500">Analyse du taux de rotation du personnel</p>
+          <div>
+            <h3 class="text-sm font-semibold text-card-foreground">Rapport de Turnover</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">Analyse du taux de rotation du personnel</p>
           </div>
         </div>
-        <div class="mt-6">
-          <p class="text-sm text-gray-600">
-            Accédez aux tendances de rotation des effectifs, aux taux par département et aux analyses mensuelles.
-          </p>
-        </div>
-        <div class="mt-6 flex justify-between">
-          <a routerLink="/reports/turnover" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200">
+        <p class="text-sm text-muted-foreground mt-4">Tendances de rotation, taux par departement et analyses mensuelles.</p>
+        <div class="flex items-center justify-between mt-4">
+          <a routerLink="/reports/turnover"
+            class="inline-flex items-center rounded-md bg-primary px-3 h-8 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
             Voir le rapport
           </a>
-          <button (click)="generateReport('turnover')" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Télécharger
+          <button (click)="generateReport('turnover')" type="button"
+            class="inline-flex items-center rounded-md border border-input bg-background px-3 h-8 text-xs font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            Telecharger
+          </button>
+        </div>
+      </div>
+
+      <!-- Absenteeism -->
+      <div class="rounded-lg border bg-card shadow-sm p-6">
+        <div class="flex items-center gap-4">
+          <div class="rounded-lg bg-muted p-3 shrink-0">
+            <svg class="h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-card-foreground">Rapport d'Absenteisme</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">Suivi des absences et conges</p>
+          </div>
+        </div>
+        <p class="text-sm text-muted-foreground mt-4">Taux d'absenteisme global, par departement et par type de conge.</p>
+        <div class="flex items-center justify-between mt-4">
+          <a routerLink="/reports/absenteeism"
+            class="inline-flex items-center rounded-md bg-primary px-3 h-8 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+            Voir le rapport
+          </a>
+          <button (click)="generateReport('absenteeism')" type="button"
+            class="inline-flex items-center rounded-md border border-input bg-background px-3 h-8 text-xs font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            Telecharger
+          </button>
+        </div>
+      </div>
+
+      <!-- Salary -->
+      <div class="rounded-lg border bg-card shadow-sm p-6">
+        <div class="flex items-center gap-4">
+          <div class="rounded-lg bg-muted p-3 shrink-0">
+            <svg class="h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-card-foreground">Couts Salariaux</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">Analyse des depenses salariales</p>
+          </div>
+        </div>
+        <p class="text-sm text-muted-foreground mt-4">Evolution des couts, moyennes par departement et par type de contrat.</p>
+        <div class="flex items-center justify-between mt-4">
+          <a routerLink="/reports/salary"
+            class="inline-flex items-center rounded-md bg-primary px-3 h-8 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+            Voir le rapport
+          </a>
+          <button (click)="generateReport('salary')" type="button"
+            class="inline-flex items-center rounded-md border border-input bg-background px-3 h-8 text-xs font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            Telecharger
+          </button>
+        </div>
+      </div>
+
+      <!-- Distribution -->
+      <div class="rounded-lg border bg-card shadow-sm p-6">
+        <div class="flex items-center gap-4">
+          <div class="rounded-lg bg-muted p-3 shrink-0">
+            <svg class="h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-card-foreground">Distribution des Employes</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">Repartition demographique du personnel</p>
+          </div>
+        </div>
+        <p class="text-sm text-muted-foreground mt-4">Repartition par age, genre, anciennete et departement.</p>
+        <div class="flex items-center justify-between mt-4">
+          <a routerLink="/reports/distribution"
+            class="inline-flex items-center rounded-md bg-primary px-3 h-8 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+            Voir le rapport
+          </a>
+          <button (click)="generateReport('distribution')" type="button"
+            class="inline-flex items-center rounded-md border border-input bg-background px-3 h-8 text-xs font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            Telecharger
           </button>
         </div>
       </div>
     </div>
-
-    <!-- Absenteeism Report Card -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-6">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <div class="ml-5">
-            <h3 class="text-lg font-medium text-gray-900">Rapport d'Absentéisme</h3>
-            <p class="text-sm text-gray-500">Suivi des absences et congés</p>
-          </div>
-        </div>
-        <div class="mt-6">
-          <p class="text-sm text-gray-600">
-            Visualisez le taux d'absentéisme global, par département et par type de congé.
-          </p>
-        </div>
-        <div class="mt-6 flex justify-between">
-          <a routerLink="/reports/absenteeism" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200">
-            Voir le rapport
-          </a>
-          <button (click)="generateReport('absenteeism')" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Télécharger
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Salary Cost Report Card -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-6">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div class="ml-5">
-            <h3 class="text-lg font-medium text-gray-900">Rapport des Coûts Salariaux</h3>
-            <p class="text-sm text-gray-500">Analyse des dépenses salariales</p>
-          </div>
-        </div>
-        <div class="mt-6">
-          <p class="text-sm text-gray-600">
-            Accédez à l'évolution des coûts salariaux, aux moyennes par département et par type de contrat.
-          </p>
-        </div>
-        <div class="mt-6 flex justify-between">
-          <a routerLink="/reports/salary" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200">
-            Voir le rapport
-          </a>
-          <button (click)="generateReport('salary')" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Télécharger
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Employee Distribution Report Card -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-6">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
-            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-          </div>
-          <div class="ml-5">
-            <h3 class="text-lg font-medium text-gray-900">Rapport de Distribution des Employés</h3>
-            <p class="text-sm text-gray-500">Répartition démographique du personnel</p>
-          </div>
-        </div>
-        <div class="mt-6">
-          <p class="text-sm text-gray-600">
-            Visualisez la répartition des effectifs par âge, genre, ancienneté et département.
-          </p>
-        </div>
-        <div class="mt-6 flex justify-between">
-          <a routerLink="/reports/distribution" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200">
-            Voir le rapport
-          </a>
-          <button (click)="generateReport('distribution')" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Télécharger
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  }
 </div>

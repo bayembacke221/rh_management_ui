@@ -1,29 +1,29 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="md:flex md:items-center md:justify-between">
-    <div class="flex-1 min-w-0">
-      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-foreground">
         Rapport de Turnover
-      </h2>
-      <p class="mt-1 text-sm text-gray-500">
-        Analyse détaillée de la rotation du personnel
+      </h1>
+      <p class="text-sm text-muted-foreground mt-1">
+        Analyse detaillee de la rotation du personnel
       </p>
     </div>
-    <div class="mt-4 flex md:mt-0 md:ml-4">
-      <form [formGroup]="filterForm" class="flex items-center space-x-2">
-        <div>
-          <label for="year" class="block text-sm font-medium text-gray-700">Année</label>
-          <select id="year" formControlName="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+    <div class="flex items-center gap-3">
+      <form [formGroup]="filterForm" class="flex items-center gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="year" class="text-sm font-medium text-foreground">Annee</label>
+          <select id="year" formControlName="year" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
             <option [value]="currentYear - 2">{{ currentYear - 2 }}</option>
             <option [value]="currentYear - 1">{{ currentYear - 1 }}</option>
             <option [value]="currentYear">{{ currentYear }}</option>
           </select>
         </div>
-        <div class="ml-2 mt-6">
-          <button (click)="downloadReport()" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <div class="flex items-end">
+          <button (click)="downloadReport()" type="button" class="inline-flex items-center rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            <svg class="-ml-1 mr-2 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
-            Télécharger
+            Telecharger
           </button>
         </div>
       </form>
@@ -31,212 +31,161 @@
   </div>
 
   <!-- Loading state -->
-  <div *ngIf="loading" class="mt-6 flex justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
+  @if (loading) {
+    <div class="flex justify-center py-12">
+      <svg class="h-8 w-8 animate-spin text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  }
 
   <!-- Error state -->
-  <div *ngIf="error" class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3">
+      <div class="flex items-center gap-3">
+        <svg class="h-5 w-5 text-destructive" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
         </svg>
-      </div>
-      <div class="ml-3">
-        <p class="text-sm text-red-700">{{ error }}</p>
+        <p class="text-sm text-destructive">{{ error }}</p>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Report content -->
-  <div *ngIf="!loading && !error && report" class="mt-8">
+  @if (!loading && !error && report) {
     <!-- Summary cards -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Taux de Turnover
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.turnoverRate | percent:'1.1-1' }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Effectif Initial
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.startEmployeeCount }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-red-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Départs
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.departures }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-              <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Nouvelles embauches
-              </dt>
-              <dd class="flex items-baseline">
-                <div class="text-2xl font-semibold text-gray-900">
-                  {{ report.newHires }}
-                </div>
-              </dd>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Taux de Turnover
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.turnoverRate }}%
+        </dd>
+      </dl>
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Effectif Initial
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.startEmployeeCount }}
+        </dd>
+      </dl>
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Departs
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.departures }}
+        </dd>
+      </dl>
+      <dl class="rounded-lg border bg-card shadow-sm p-6">
+        <dt class="text-sm font-medium text-muted-foreground">
+          Nouvelles embauches
+        </dt>
+        <dd class="text-2xl font-bold text-card-foreground mt-2">
+          {{ report.newHires }}
+        </dd>
+      </dl>
     </div>
 
     <!-- Monthly turnover chart -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Évolution mensuelle du turnover
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-base font-semibold text-card-foreground">
+          Evolution mensuelle du turnover
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-          Taux de turnover par mois pour l'année {{ report.year }}
+        <p class="text-sm text-muted-foreground mt-1">
+          Taux de turnover par mois pour l'annee {{ report.year }}
         </p>
       </div>
-      <div class="px-4 py-5 sm:p-6">
-        <!-- Barchart -->
-        <div class="h-80 flex items-end justify-between space-x-2">
-          <ng-container *ngFor="let month of report.monthlyTurnover">
-            <div class="flex flex-col items-center">
-              <div class="relative w-8">
-                <div class="absolute bottom-0 w-full bg-blue-500 rounded-t"
-                     [style.height]="getBarHeight(month.turnoverRate || 0)"></div>
-              </div>
-              <div class="mt-2 text-xs text-gray-500">{{ getMonthName(month.month || 0) }}</div>
-              <div class="text-xs font-medium text-gray-700">{{ month.turnoverRate | percent:'1.0-1' }}</div>
+      <div class="p-6">
+        <div class="flex items-end justify-between gap-3 h-80">
+          @for (month of report.monthlyTurnover; track month) {
+            <div class="flex-1 flex flex-col items-center h-full justify-end">
+              <div class="w-full max-w-12 bg-blue-600 rounded-t transition-all duration-500 min-h-[4px]"
+                [style.height]="getBarHeight(month.turnoverRate || 0)"></div>
+              <div class="mt-3 text-xs text-muted-foreground truncate w-full text-center">{{ getMonthName(month.month || 0) }}</div>
+              <div class="text-xs font-semibold text-card-foreground">{{ month.turnoverRate }}%</div>
             </div>
-          </ng-container>
+          }
         </div>
       </div>
     </div>
 
     <!-- Department turnover -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Turnover par département
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-base font-semibold text-card-foreground">
+          Turnover par departement
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-          Analyse de la rotation du personnel par département
+        <p class="text-sm text-muted-foreground mt-1">
+          Analyse de la rotation du personnel par departement
         </p>
       </div>
-      <div class="px-4 py-5 sm:p-6">
+      <div class="p-6">
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Département
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Effectif initial
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Départs
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Embauches
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Taux de turnover
-              </th>
-            </tr>
+          <table class="min-w-full divide-y divide-border">
+            <thead class="border-b bg-muted/50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Departement
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Effectif initial
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Departs
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Embauches
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Taux de turnover
+                </th>
+              </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let dept of report.departmentTurnover">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ dept.departmentName }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ dept.startEmployeeCount }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ dept.departures }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ dept.newHires }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="w-20 bg-gray-200 rounded-full h-2.5">
-                    <div class="bg-blue-600 h-2.5 rounded-full" [style.width]="(dept.turnoverRate! * 100) + '%'"></div>
-                  </div>
-                  <span class="ml-2 text-sm text-gray-700">{{ dept.turnoverRate | percent:'1.1-1' }}</span>
-                </div>
-              </td>
-            </tr>
+            <tbody class="divide-y divide-border">
+              @for (dept of report.departmentTurnover; track dept) {
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-card-foreground">
+                    {{ dept.departmentName }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {{ dept.startEmployeeCount }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {{ dept.departures }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {{ dept.newHires }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <div class="w-32 bg-muted rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" [style.width]="dept.turnoverRate + '%'"></div>
+                      </div>
+                      <span class="text-sm font-medium text-card-foreground">{{ dept.turnoverRate }}%</span>
+                    </div>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Empty state -->
-  <div *ngIf="!loading && !error && !report" class="mt-8 text-center py-12 bg-white shadow rounded-lg">
-    <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune donnée disponible</h3>
-    <p class="mt-1 text-sm text-gray-500">Aucune donnée de turnover n'est disponible pour l'année sélectionnée.</p>
-  </div>
+  @if (!loading && !error && !report) {
+    <div class="rounded-lg border bg-card shadow-sm p-12 text-center">
+      <svg class="mx-auto h-12 w-12 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-card-foreground">Aucune donnee disponible</h3>
+      <p class="mt-1 text-sm text-muted-foreground">Aucune donnee de turnover n'est disponible pour l'annee selectionnee.</p>
+    </div>
+  }
 </div>

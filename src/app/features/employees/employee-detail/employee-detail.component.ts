@@ -26,6 +26,12 @@ export class EmployeeDetailComponent implements OnInit {
   error: string | null = null;
 
   activeTab: 'info' | 'documents' | 'contracts' | 'leaves' = 'info';
+  tabs: { id: 'info' | 'documents' | 'contracts' | 'leaves'; label: string }[] = [
+    { id: 'info', label: 'Informations' },
+    { id: 'documents', label: 'Documents' },
+    { id: 'contracts', label: 'Contrats' },
+    { id: 'leaves', label: 'Absences' },
+  ];
 
   constructor(
     private route: ActivatedRoute,

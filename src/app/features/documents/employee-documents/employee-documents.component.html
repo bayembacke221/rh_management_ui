@@ -1,172 +1,163 @@
-<div class="bg-white shadow overflow-hidden sm:rounded-lg">
-  <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-    <div>
-      <h3 class="text-lg leading-6 font-medium text-gray-900">Documents</h3>
-      <p class="mt-1 max-w-2xl text-sm text-gray-500">Documents associés à l'employé</p>
-    </div>
-    <button
-      (click)="uploadPanelVisible = !uploadPanelVisible"
-      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-      <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+<div class="space-y-4">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h3 class="text-base font-semibold text-foreground">Documents de l'employe</h3>
+    <button (click)="uploadPanelVisible = !uploadPanelVisible" type="button"
+      class="inline-flex items-center gap-2 rounded-md bg-primary px-3 h-9 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
       Ajouter un document
     </button>
   </div>
 
-  <!-- Panel d'upload de documents -->
-  <div *ngIf="uploadPanelVisible" class="border-t border-gray-200 px-4 py-5 sm:px-6 bg-gray-50">
-    <form (submit)="uploadDocument(); $event.preventDefault()" class="space-y-4">
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label for="documentType" class="block text-sm font-medium text-gray-700">Type de document *</label>
-          <select
-            id="documentType"
-            [(ngModel)]="documentType"
-            name="documentType"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-            <option value="CV">CV</option>
-            <option value="IDENTITY">Pièce d'identité</option>
-            <option value="DIPLOMA">Diplôme</option>
-            <option value="CONTRACT">Contrat</option>
-            <option value="PAYSLIP">Bulletin de paie</option>
-            <option value="CERTIFICATE">Certificat</option>
-            <option value="ADMINISTRATIVE">Document administratif</option>
-            <option value="OTHER">Autre</option>
-          </select>
-        </div>
-        <div>
-          <label for="documentName" class="block text-sm font-medium text-gray-700">Nom du document</label>
-          <input
-            type="text"
-            id="documentName"
-            [(ngModel)]="documentName"
-            name="documentName"
-            class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Fichier *</label>
-        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-          <div class="space-y-1 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <div class="flex text-sm text-gray-600">
-              <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                <span>Upload a file</span>
-                <input
-                  id="file-upload"
-                  name="file-upload"
-                  type="file"
-                  class="sr-only"
-                  (change)="onFileChange($event)">
-              </label>
-              <p class="pl-1">or drag and drop</p>
-            </div>
-            <p class="text-xs text-gray-500">
-              PDF, DOCX, XLS, JPG, PNG up to 10MB
-            </p>
-            <p *ngIf="selectedFile" class="text-sm text-blue-600">
-              {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(0) }} KB)
-            </p>
+  <!-- Upload panel -->
+  @if (uploadPanelVisible) {
+    <div class="rounded-lg border bg-card shadow-sm p-4 animate-fade-in">
+      <form (submit)="uploadDocument(); $event.preventDefault()" class="space-y-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="space-y-1.5">
+            <label for="documentType" class="text-sm font-medium text-foreground">Type *</label>
+            <select id="documentType" [(ngModel)]="documentType" name="documentType"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+              <option value="CV">CV</option>
+              <option value="IDENTITY">Piece d'identite</option>
+              <option value="DIPLOMA">Diplome</option>
+              <option value="CONTRACT">Contrat</option>
+              <option value="PAYSLIP">Bulletin de paie</option>
+              <option value="CERTIFICATE">Certificat</option>
+              <option value="ADMINISTRATIVE">Administratif</option>
+              <option value="OTHER">Autre</option>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label for="documentName" class="text-sm font-medium text-foreground">Nom</label>
+            <input type="text" id="documentName" [(ngModel)]="documentName" name="documentName"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
           </div>
         </div>
-      </div>
+        <div class="space-y-1.5">
+          <label class="text-sm font-medium text-foreground">Fichier *</label>
+          <div class="flex items-center gap-3">
+            <input id="file-upload" name="file-upload" type="file" class="sr-only" (change)="onFileChange($event)">
+            <label for="file-upload"
+              class="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 h-9 text-sm font-medium text-foreground shadow-sm hover:bg-accent transition-colors cursor-pointer">
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+              </svg>
+              Choisir fichier
+            </label>
+            @if (selectedFile) {
+              <span class="text-sm text-foreground">{{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(0) }} KB)</span>
+            } @else {
+              <span class="text-xs text-muted-foreground">PDF, DOCX, JPG, PNG - max 10MB</span>
+            }
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-3">
+          <button type="button" (click)="uploadPanelVisible = false"
+            class="inline-flex items-center rounded-md border border-input bg-background px-3 h-8 text-xs font-medium text-foreground shadow-sm hover:bg-accent transition-colors">
+            Annuler
+          </button>
+          <button type="submit" [disabled]="!selectedFile || uploading"
+            class="inline-flex items-center rounded-md bg-primary px-3 h-8 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none">
+            @if (uploading) {
+              <svg class="animate-spin -ml-1 mr-1.5 h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            }
+            Upload
+          </button>
+        </div>
+      </form>
+    </div>
+  }
 
-      <div class="flex justify-end space-x-3">
-        <button
-          type="button"
-          (click)="uploadPanelVisible = false"
-          class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-          Annuler
-        </button>
-        <button
-          type="submit"
-          [disabled]="!selectedFile || uploading"
-          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          [ngClass]="{'opacity-70 cursor-not-allowed': !selectedFile || uploading}">
-          <svg *ngIf="uploading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Upload
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Liste des documents -->
-  <div class="border-t border-gray-200">
-    <!-- Loading state -->
-    <div *ngIf="loading" class="px-4 py-8 text-center text-gray-500">
-      <svg class="animate-spin mx-auto h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex justify-center py-8">
+      <svg class="animate-spin h-6 w-6 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
-      <p class="mt-2">Chargement des documents...</p>
     </div>
+  }
 
-    <!-- Error state -->
-    <div *ngIf="error" class="px-4 py-5 sm:p-6 bg-red-50 text-red-700 border-l-4 border-red-500">
-      <p>{{ error }}</p>
-      <button (click)="loadDocuments()" class="mt-2 text-sm font-medium hover:underline">Réessayer</button>
+  <!-- Error -->
+  @if (error) {
+    <div class="rounded-md bg-destructive/10 px-4 py-3">
+      <div class="flex items-center gap-2">
+        <svg class="h-4 w-4 text-destructive shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
+        </svg>
+        <p class="text-sm text-destructive">{{ error }}</p>
+        <button (click)="loadDocuments()" type="button" class="ml-auto text-sm font-medium text-destructive hover:underline">Reessayer</button>
+      </div>
     </div>
+  }
 
-    <!-- Empty state -->
-    <div *ngIf="!loading && !error && documents.length === 0" class="px-4 py-8 text-center text-gray-500">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  <!-- Empty -->
+  @if (!loading && !error && documents.length === 0) {
+    <div class="rounded-lg border bg-card shadow-sm py-8 text-center">
+      <svg class="mx-auto h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
       </svg>
-      <p class="mt-2">Aucun document disponible</p>
+      <p class="mt-2 text-sm text-muted-foreground">Aucun document disponible</p>
     </div>
+  }
 
-    <!-- Document list -->
-    <div *ngIf="!loading && !error && documents.length > 0" class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date d'upload</th>
-          <th scope="col" class="relative px-6 py-3">
-            <span class="sr-only">Actions</span>
-          </th>
-        </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-        <tr *ngFor="let document of documents">
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900">{{ document.name }}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                {{ getDocumentTypeName(document.type!) }}
-              </span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            {{ formatDate(document.uploadDate) }}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button
-              (click)="downloadDocument(document.id!)"
-              class="text-blue-600 hover:text-blue-900 mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-            </button>
-            <button
-              (click)="deleteDocument(document.id!)"
-              class="text-red-600 hover:text-red-900">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+  <!-- Document list -->
+  @if (!loading && !error && documents.length > 0) {
+    <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b bg-muted/50">
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Nom</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            @for (document of documents; track document.id) {
+              <tr class="hover:bg-muted/50 transition-colors">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex items-center gap-2">
+                    <svg class="h-4 w-4 text-muted-foreground shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    <span class="text-sm font-medium text-card-foreground">{{ document.name }}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {{ getDocumentTypeName(document.type!) }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">{{ formatDate(document.uploadDate) }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <button (click)="downloadDocument(document.id!)" type="button" title="Telecharger"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                      </svg>
+                    </button>
+                    <button (click)="deleteDocument(document.id!)" type="button" title="Supprimer"
+                      class="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  }
 </div>

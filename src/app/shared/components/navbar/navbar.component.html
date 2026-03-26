@@ -1,134 +1,200 @@
-<nav class="bg-white shadow">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16">
-      <div class="flex">
-        <!-- Sidebar toggle -->
-        <div class="-ml-2 mr-2 flex items-center">
-          <button (click)="toggleSidebar.emit()" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-            <span class="sr-only">Ouvrir le menu</span>
-            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
+<header class="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+  <!-- Sidebar toggle -->
+  <button
+    (click)="toggleSidebar.emit()"
+    type="button"
+    class="inline-flex items-center justify-center rounded-md h-9 w-9 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+    <span class="sr-only">Toggle menu</span>
+  </button>
 
-        <!-- Search bar -->
-        <div class="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:justify-start">
-          <div class="max-w-lg w-full lg:max-w-xs">
-            <label for="search" class="sr-only">Rechercher</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+  <!-- Search -->
+  <div class="flex-1 max-w-md">
+    <div class="relative">
+      <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      </svg>
+      <input
+        type="search"
+        placeholder="Rechercher..."
+        class="flex h-9 w-full rounded-md border border-input bg-transparent pl-9 pr-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+    </div>
+  </div>
+
+  <!-- Right section -->
+  <div class="flex items-center gap-2">
+    <!-- Notifications -->
+    <div class="relative">
+      <button
+        (click)="toggleNotifications()"
+        type="button"
+        title="Notifications"
+        class="inline-flex items-center justify-center rounded-md h-9 w-9 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors relative">
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+        </svg>
+        @if (unreadCount > 0) {
+          <span class="absolute -top-0.5 -right-0.5 flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
+            {{ unreadCount > 99 ? '99+' : unreadCount }}
+          </span>
+        }
+        <span class="sr-only">Notifications</span>
+      </button>
+
+      <!-- Notifications dropdown -->
+      @if (notificationsOpen) {
+        <div class="absolute right-0 mt-2 w-96 rounded-lg border bg-popover shadow-lg animate-fade-in">
+          <div class="flex items-center justify-between px-4 py-3 border-b">
+            <div class="flex items-center gap-2">
+              <h4 class="text-sm font-semibold text-popover-foreground">Notifications</h4>
+              @if (unreadCount > 0) {
+                <span class="inline-flex items-center rounded-full bg-destructive/10 px-1.5 py-0.5 text-xs font-medium text-destructive">{{ unreadCount }}</span>
+              }
+            </div>
+            @if (unreadCount > 0) {
+              <button (click)="markAllAsRead()" type="button" class="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Tout marquer comme lu
+              </button>
+            }
+          </div>
+
+          <div class="max-h-96 overflow-y-auto">
+            <!-- Loading -->
+            @if (loadingNotifications) {
+              <div class="flex justify-center py-6">
+                <svg class="animate-spin h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               </div>
-              <input id="search" name="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Rechercher" type="search">
-            </div>
+            }
+
+            <!-- Empty -->
+            @if (!loadingNotifications && notifications.length === 0) {
+              <div class="py-8 text-center">
+                <svg class="mx-auto h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                </svg>
+                <p class="mt-2 text-sm text-muted-foreground">Aucune notification</p>
+              </div>
+            }
+
+            <!-- Notification items -->
+            @if (!loadingNotifications && notifications.length > 0) {
+              @for (notification of notifications; track notification.id) {
+                <a
+                  [routerLink]="notification.actionUrl || null"
+                  (click)="markAsRead(notification)"
+                  class="flex items-start gap-3 px-4 py-3 hover:bg-accent transition-colors border-b last:border-b-0 cursor-pointer"
+                  [class.bg-primary/5]="!notification.read">
+                  <!-- Icon -->
+                  <div class="shrink-0 mt-0.5 h-8 w-8 rounded-full flex items-center justify-center"
+                    [ngClass]="notificationService.getTypeColor(notification.type)">
+                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="notificationService.getTypeIcon(notification.type)" />
+                    </svg>
+                  </div>
+                  <!-- Content -->
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-2">
+                      <p class="text-sm font-medium text-popover-foreground leading-tight"
+                        [class.font-semibold]="!notification.read">
+                        {{ notification.title }}
+                      </p>
+                      @if (!notification.read) {
+                        <span class="mt-1 h-2 w-2 rounded-full bg-primary shrink-0"></span>
+                      }
+                    </div>
+                    <p class="text-xs text-muted-foreground mt-0.5 line-clamp-2">{{ notification.content }}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-xs text-muted-foreground">{{ notificationService.formatTimeAgo(notification.createdDate) }}</span>
+                      @if (notification.priority === 'HIGH' || notification.priority === 'URGENT') {
+                        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium"
+                          [ngClass]="notificationService.getPriorityColor(notification.priority)">
+                          {{ notification.priority }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </a>
+              }
+            }
+          </div>
+
+          <!-- Footer -->
+          <div class="px-4 py-2.5 border-t">
+            <a routerLink="/notifications" (click)="notificationsOpen = false"
+              class="flex items-center justify-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Voir toutes les notifications
+              <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z" clip-rule="evenodd" />
+              </svg>
+            </a>
           </div>
         </div>
-      </div>
+      }
+    </div>
 
-      <!-- Right section -->
-      <div class="flex items-center">
-        <!-- Notification bell -->
-        <button (click)="toggleNotifications()" type="button" class="relative p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <span class="sr-only">Voir les notifications</span>
-          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
-        </button>
+    <!-- Separator -->
+    <div class="h-6 w-px bg-border"></div>
 
-        <!-- Profile dropdown -->
-        <div class="ml-4 relative flex-shrink-0">
-          <div>
-            <button (click)="toggleUserDropdown()" type="button" class="bg-white rounded-full flex focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu" aria-expanded="false" aria-haspopup="true">
-              <span class="sr-only">Ouvrir le menu utilisateur</span>
-              <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name={{currentUser?.fullName}}&background=0D8ABC&color=fff" alt="">
+    <!-- User dropdown -->
+    <div class="relative">
+      <button
+        (click)="toggleUserDropdown()"
+        type="button"
+        class="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent transition-colors">
+        <img
+          class="h-7 w-7 rounded-full ring-1 ring-border"
+          src="https://ui-avatars.com/api/?name={{currentUser?.fullName}}&background=18181b&color=fafafa&size=28"
+          alt="">
+        <div class="hidden sm:block text-left">
+          <p class="text-sm font-medium text-foreground leading-none">{{ currentUser?.fullName }}</p>
+          <p class="text-xs text-muted-foreground mt-0.5">{{ currentUser?.email }}</p>
+        </div>
+        <svg class="h-4 w-4 text-muted-foreground hidden sm:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+        </svg>
+      </button>
+
+      <!-- User menu -->
+      @if (userDropdownOpen) {
+        <div class="absolute right-0 mt-1 w-56 rounded-lg border bg-popover shadow-md animate-fade-in" role="menu">
+          <div class="px-3 py-2.5 border-b">
+            <p class="text-sm font-medium text-popover-foreground">{{ currentUser?.fullName }}</p>
+            <p class="text-xs text-muted-foreground">{{ currentUser?.email }}</p>
+          </div>
+          <div class="py-1">
+            <a routerLink="/settings" (click)="userDropdownOpen = false" class="flex items-center gap-2 px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors" role="menuitem">
+              <svg class="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+              Votre profil
+            </a>
+            <a routerLink="/settings" (click)="userDropdownOpen = false" class="flex items-center gap-2 px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors" role="menuitem">
+              <svg class="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+              Parametres
+            </a>
+          </div>
+          <div class="border-t py-1">
+            <button
+              type="button"
+              (click)="logout()"
+              class="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+              role="menuitem">
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+              </svg>
+              Se deconnecter
             </button>
           </div>
-
-          <!-- User dropdown menu -->
-          <div *ngIf="userDropdownOpen" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
-            <div class="block px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
-              <p class="font-medium">{{ currentUser?.fullName }}</p>
-              <p class="text-gray-500">{{ currentUser?.email }}</p>
-            </div>
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Votre Profil</a>
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Paramètres</a>
-            <button (click)="logout()" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Se déconnecter</button>
-          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
-
-  <!-- Notifications dropdown -->
-  <div *ngIf="notificationsOpen" class="absolute right-12 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" role="menu">
-    <div class="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
-      <div class="flex justify-between items-center">
-        <p class="font-medium">Notifications</p>
-        <a href="#" class="text-blue-600 text-xs">Marquer toutes comme lues</a>
-      </div>
-    </div>
-
-    <!-- Notification items -->
-    <div class="max-h-72 overflow-y-auto">
-      <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition duration-150 ease-in-out border-b border-gray-100">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe&background=0D8ABC&color=fff" alt="">
-          </div>
-          <div class="ml-3 w-0 flex-1">
-            <p class="text-sm font-medium text-gray-900">Nouveau contrat pour Jean Dupont</p>
-            <p class="text-sm text-gray-500">Le contrat CDI est prêt à être signé</p>
-            <p class="mt-1 text-xs text-gray-500">Il y a 2 heures</p>
-          </div>
-        </div>
-      </a>
-
-      <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition duration-150 ease-in-out border-b border-gray-100">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-              <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <div class="ml-3 w-0 flex-1">
-            <p class="text-sm font-medium text-gray-900">Demande de congés approuvée</p>
-            <p class="text-sm text-gray-500">Votre demande du 15/07 au 30/07 a été acceptée</p>
-            <p class="mt-1 text-xs text-gray-500">Hier</p>
-          </div>
-        </div>
-      </a>
-
-      <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition duration-150 ease-in-out">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-              <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <div class="ml-3 w-0 flex-1">
-            <p class="text-sm font-medium text-gray-900">Alerte fin de période d'essai</p>
-            <p class="text-sm text-gray-500">Marie Martin - Fin de période d'essai dans 7 jours</p>
-            <p class="mt-1 text-xs text-gray-500">Il y a 3 jours</p>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="px-4 py-2 text-sm border-t border-gray-200">
-      <a href="#" class="text-blue-600 flex justify-center items-center">
-        Voir toutes les notifications
-        <svg class="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-        </svg>
-      </a>
-    </div>
-  </div>
-</nav>
+</header>

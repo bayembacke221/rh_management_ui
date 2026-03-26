@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RapportsService } from '../../../services/services/rapports.service';
@@ -7,7 +7,7 @@ import { RapportsService } from '../../../services/services/rapports.service';
 @Component({
   selector: 'app-reports-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [RouterModule, ReactiveFormsModule],
   templateUrl: './reports-dashboard.component.html'
 })
 export class ReportsDashboardComponent implements OnInit {
